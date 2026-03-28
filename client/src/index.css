@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-100 min-h-screen antialiased;
+  }
+}
+
+/* Custom progress bar animation */
+.progress-bar-animated {
+  transition: width 0.5s ease-in-out;
+}
