@@ -37,7 +37,8 @@ function triggerJob(req, res) {
     createdAt: new Date().toISOString(),
     startedAt: null,
     completedAt: null,
-    shouldFail: Boolean(shouldFail) // Optional flag to simulate failure
+    shouldFail: Boolean(shouldFail), // Optional flag to simulate failure
+    logs: [] // array of strings
   };
 
   store.addJob(job);

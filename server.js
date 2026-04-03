@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http'); // HTTP server for socket.io
 const jobRoutes = require('./routes/jobs');
+const workerRoutes = require('./routes/workers');
 const { init } = require('./websocket/socket'); // Socket entry
 
 const app = express();
@@ -13,6 +14,9 @@ app.use(express.json());
 
 // Main Job Controller Routes
 app.use('/api/jobs', jobRoutes);
+
+// Workers Endpoint
+app.use('/api/workers', workerRoutes);
 
 // Base route for sanity ping
 app.get('/', (req, res) => {

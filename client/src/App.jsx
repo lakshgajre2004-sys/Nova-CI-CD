@@ -4,6 +4,8 @@ import { io } from 'socket.io-client';
 import { Toaster, toast } from 'react-hot-toast';
 import { BASE_URL } from './config/api';
 import JobCard from './components/JobCard';
+import WorkerStatusPanel from './components/WorkerStatusPanel';
+import PipelineExecutionPanel from './components/PipelineExecutionPanel';
 import { Activity, Rocket } from 'lucide-react';
 
 export default function App() {
@@ -11,6 +13,7 @@ export default function App() {
   const [repo, setRepo] = useState('https://github.com/example/repo.git');
   const [branch, setBranch] = useState('main');
   const [loading, setLoading] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState(null);
 
   // Fetch initial dashboard state
   const fetchDashboard = async () => {
@@ -117,62 +120,83 @@ export default function App() {
         </form>
       </header>
 
-      {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* QUEUED Column */}
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center space-x-2 pb-2 border-b border-amber-500/20 px-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-500 px-2"/>
-            <h2 className="text-lg font-semibold text-amber-500 tracking-wide">QUEUED</h2>
-            <span className="bg-amber-500/10 text-amber-500 text-xs py-0.5 px-2.5 rounded-full ml-auto">
-              {dashboard.queued?.length || 0}
-            </span>
+      {/* Content Area with Sidebar */}
+      <div className="flex flex-col xl:flex-row gap-6">
+        
+        {/* Left Sidebar for Workers */}
+        <div className="xl:w-72 flex-shrink-0">
+          <WorkerStatusPanel />
+        </div>
+
+        {/* Main Grid Layout */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* QUEUED Column */}
+          <div className="flex flex-col space-y-4">
+            <div className="flex items-center space-x-2 pb-2 border-b border-amber-500/20 px-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-amber-500 px-2"/>
+              <h2 className="text-lg font-semibold text-amber-500 tracking-wide">QUEUED</h2>
+              <span className="bg-amber-500/10 text-amber-500 text-xs py-0.5 px-2.5 rounded-full ml-auto">
+                {dashboard.queued?.length || 0}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-4 overflow-y-auto pr-2 custom-scroll max-h-[70vh]">
+              {dashboard.queued?.length > 0 ? (
+                dashboard.queued.map(job => <JobCard key={job.id} job={job} onClickLogs={() => setSelectedJobId(job.id)} />)
+              ) : (
+                <p className="text-slate-500 text-sm italic py-4 text-center">No jobs queued.</p>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col space-y-4 overflow-y-auto pr-2 custom-scroll max-h-[70vh]">
-            {dashboard.queued?.length > 0 ? (
-              dashboard.queued.map(job => <JobCard key={job.id} job={job} />)
-            ) : (
-              <p className="text-slate-500 text-sm italic py-4 text-center">No jobs queued.</p>
-            )}
+
+          {/* IN PROGRESS Column */}
+          <div className="flex flex-col space-y-4">
+            <div className="flex items-center space-x-2 pb-2 border-b border-blue-500/20 px-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-500 px-2 animate-pulse"/>
+              <h2 className="text-lg font-semibold text-blue-500 tracking-wide">IN PROGRESS</h2>
+              <span className="bg-blue-500/10 text-blue-500 text-xs py-0.5 px-2.5 rounded-full ml-auto">
+                {dashboard.inProgress?.length || 0}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-4 overflow-y-auto pr-2 custom-scroll max-h-[70vh]">
+              {dashboard.inProgress?.length > 0 ? (
+                dashboard.inProgress.map(job => <JobCard key={job.id} job={job} onClickLogs={() => setSelectedJobId(job.id)} />)
+              ) : (
+                <p className="text-slate-500 text-sm italic py-4 text-center">No running jobs.</p>
+              )}
+            </div>
+          </div>
+
+          {/* COMPLETED Column */}
+          <div className="flex flex-col space-y-4">
+            <div className="flex items-center space-x-2 pb-2 border-b border-green-500/20 px-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500 px-2"/>
+              <h2 className="text-lg font-semibold text-green-500 tracking-wide">COMPLETED</h2>
+              <span className="bg-green-500/10 text-green-500 text-xs py-0.5 px-2.5 rounded-full ml-auto">
+                {dashboard.completed?.length || 0}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-4 overflow-y-auto pr-2 custom-scroll max-h-[70vh]">
+              {dashboard.completed?.length > 0 ? (
+                dashboard.completed.map(job => <JobCard key={job.id} job={job} onClickLogs={() => setSelectedJobId(job.id)} />)
+              ) : (
+                <p className="text-slate-500 text-sm italic py-4 text-center">No completed jobs.</p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* IN PROGRESS Column */}
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center space-x-2 pb-2 border-b border-blue-500/20 px-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 px-2 animate-pulse"/>
-            <h2 className="text-lg font-semibold text-blue-500 tracking-wide">IN PROGRESS</h2>
-            <span className="bg-blue-500/10 text-blue-500 text-xs py-0.5 px-2.5 rounded-full ml-auto">
-              {dashboard.inProgress?.length || 0}
-            </span>
-          </div>
-          <div className="flex flex-col space-y-4 overflow-y-auto pr-2 custom-scroll max-h-[70vh]">
-            {dashboard.inProgress?.length > 0 ? (
-              dashboard.inProgress.map(job => <JobCard key={job.id} job={job} />)
-            ) : (
-              <p className="text-slate-500 text-sm italic py-4 text-center">No running jobs.</p>
-            )}
-          </div>
-        </div>
-
-        {/* COMPLETED Column */}
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center space-x-2 pb-2 border-b border-green-500/20 px-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500 px-2"/>
-            <h2 className="text-lg font-semibold text-green-500 tracking-wide">COMPLETED</h2>
-            <span className="bg-green-500/10 text-green-500 text-xs py-0.5 px-2.5 rounded-full ml-auto">
-              {dashboard.completed?.length || 0}
-            </span>
-          </div>
-          <div className="flex flex-col space-y-4 overflow-y-auto pr-2 custom-scroll max-h-[70vh]">
-            {dashboard.completed?.length > 0 ? (
-              dashboard.completed.map(job => <JobCard key={job.id} job={job} />)
-            ) : (
-              <p className="text-slate-500 text-sm italic py-4 text-center">No completed jobs.</p>
-            )}
-          </div>
-        </div>
       </div>
+
+      {/* Logs Modal/Panel */}
+      <PipelineExecutionPanel 
+        jobId={selectedJobId} 
+        initialLogs={
+          selectedJobId
+            ? [...(dashboard.queued || []), ...(dashboard.inProgress || []), ...(dashboard.completed || [])].find(j => j.id === selectedJobId)?.logs || []
+            : []
+        }
+        onClose={() => setSelectedJobId(null)} 
+      />
     </div>
   );
 }

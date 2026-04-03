@@ -1,11 +1,11 @@
 const REPO_CONFIG = {
   "repo1": {
-    "main": ["Checkout", "Build", "Test", "Deploy"],
-    "dev": ["Checkout", "Build", "Test"]
+    "main": ["Fetch Code", "Install Dependencies", "Build", "Test", "Security Scan", "Docker Build", "Push to Registry"],
+    "dev": ["Fetch Code", "Install Dependencies", "Build", "Test", "Security Scan"]
   }
 };
 
-const DEFAULT_STAGES = ["Checkout", "Build", "Test"];
+const DEFAULT_STAGES = ["Fetch Code", "Install Dependencies", "Build", "Test", "Security Scan", "Docker Build", "Push to Registry"];
 
 function parseStages(repo, branch) {
   let stageNames = DEFAULT_STAGES;

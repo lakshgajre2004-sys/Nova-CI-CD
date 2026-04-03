@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, Loader2, XCircle, Circle } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, Circle, TerminalSquare, Clock, Cpu } from "lucide-react";
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -43,8 +43,8 @@ const getStatusIcon = (status) => {
   }
 };
 
-export default function JobCard({ job }) {
-  const { id, repo, branch, status, currentStage, stages } = job;
+export default function JobCard({ job, onClickLogs }) {
+  const { id, repo, branch, status, currentStage, stages, startedAt, completedAt, workerId } = job;
   
   let progressPercentage = 0;
 
@@ -57,6 +57,14 @@ export default function JobCard({ job }) {
     const totalStages = stages.length;
     progressPercentage = Math.round((completedStages / totalStages) * 100);
   }
+
+  const getDuration = () => {
+    if (!startedAt) return "N/A";
+    const start = new Date(startedAt);
+    const end = completedAt ? new Date(completedAt) : new Date();
+    const diff = Math.floor((end - start) / 1000); // in seconds
+    return `${diff}s`;
+  };
 
   return (
     <div className="bg-slate-800/80 border border-slate-700/50 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-slate-600/50 transition-all duration-300">
@@ -81,10 +89,24 @@ export default function JobCard({ job }) {
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {workerId && (
+        <div className="flex items-center space-x-1.5 mb-3">
+          <Cpu className="w-3.5 h-3.5 text-indigo-400" />
+          <span className="text-xs font-mono bg-indigo-500/10 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/20">
+            {workerId}
+          </span>
+        </div>
+      )}
+
+      {/* Progress Bar & Header Data */}
       <div className="mb-4">
-        <div className="flex justify-between text-xs text-slate-400 mb-1.5">
-          <span>Progress</span>
+        <div className="flex justify-between items-center text-xs text-slate-400 mb-1.5">
+          <div className="flex items-center space-x-3">
+            <span className="flex items-center space-x-1">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{getDuration()}</span>
+            </span>
+          </div>
           <span>{progressPercentage}%</span>
         </div>
         <div className="w-full bg-slate-900/80 rounded-full h-2 overflow-hidden">
@@ -97,7 +119,22 @@ export default function JobCard({ job }) {
 
       {/* Stages List */}
       <div className="space-y-2 mt-4 bg-slate-900/40 p-3 rounded-lg border border-slate-800">
-        <p className="text-xs text-slate-400 font-medium tracking-wider uppercase mb-2">Detailed Stages</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs text-slate-400 font-medium tracking-wider uppercase flex items-center gap-1">
+            {currentStage ? (
+              <><Loader2 className="w-3 h-3 animate-spin"/> {currentStage}</>
+            ) : (
+              "Detailed Stages"
+            )}
+          </p>
+          <button 
+            onClick={onClickLogs}
+            className="flex items-center space-x-1 text-xs text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 hover:bg-blue-500/20 px-2 py-1 rounded"
+          >
+            <TerminalSquare className="w-3.5 h-3.5" />
+            <span>Logs</span>
+          </button>
+        </div>
         {stages && stages.length > 0 ? (
           <ul className="space-y-2.5">
             {stages.map((stage, idx) => (
