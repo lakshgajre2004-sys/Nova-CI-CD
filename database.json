@@ -1,0 +1,62 @@
+{
+  "jobs": {
+    "a9647192-c15c-4d42-882b-f09ca0a81dac": {
+      "id": "a9647192-c15c-4d42-882b-f09ca0a81dac",
+      "repo": "lakshgajre2004-sys/Nova-CI-CD",
+      "branch": "main",
+      "priority": 1,
+      "status": "QUEUED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-13T14:58:56.854Z",
+      "startedAt": null,
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": []
+    }
+  },
+  "queue": []
+}
