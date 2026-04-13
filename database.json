@@ -5,7 +5,7 @@
       "repo": "lakshgajre2004-sys/Nova-CI-CD",
       "branch": "main",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "FAILED",
       "currentStage": null,
       "stages": [
         {
@@ -52,6 +52,128 @@
         }
       ],
       "createdAt": "2026-04-13T14:58:56.854Z",
+      "startedAt": "2026-04-13T14:58:58.307Z",
+      "completedAt": "2026-04-13T14:58:58.391Z",
+      "shouldFail": false,
+      "logs": [
+        "[Job a9647192] Pipeline execution started on worker worker-3",
+        "[Job a9647192] Cloning repository...",
+        "[Job a9647192] Failed to clone repository: fatal: repository 'lakshgajre2004-sys/Nova-CI-CD' does not exist\n",
+        "[Job a9647192] Pipeline finished with status: FAILED"
+      ],
+      "workerId": "worker-3"
+    },
+    "d726bd50-3a49-48af-a211-5aa299118eab": {
+      "id": "d726bd50-3a49-48af-a211-5aa299118eab",
+      "repo": "lakshgajre2004-sys/Nova-CI-CD",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-13T15:29:07.154Z",
+      "startedAt": null,
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[System] Job failed due to unexpected server restart."
+      ]
+    },
+    "fedc07fc-590d-45be-9d66-658c9e9e2eaf": {
+      "id": "fedc07fc-590d-45be-9d66-658c9e9e2eaf",
+      "repo": "lakshgajre2004-sys/Nova-CI-CD",
+      "branch": "main",
+      "priority": 1,
+      "status": "QUEUED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-13T17:04:53.176Z",
       "startedAt": null,
       "completedAt": null,
       "shouldFail": false,
