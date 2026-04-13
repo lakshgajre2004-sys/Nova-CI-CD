@@ -1,8 +1,8 @@
 const workers = [
-  { id: "worker-1", type: "node", status: "IDLE", currentJobId: null },
-  { id: "worker-2", type: "python", status: "IDLE", currentJobId: null },
-  { id: "worker-3", type: "general", status: "IDLE", currentJobId: null },
-  { id: "worker-4", type: "general", status: "IDLE", currentJobId: null }
+  { id: "worker-1", type: "node", status: "IDLE", currentJobId: null, lastActiveTime: Date.now(), currentProcess: null },
+  { id: "worker-2", type: "python", status: "IDLE", currentJobId: null, lastActiveTime: Date.now(), currentProcess: null },
+  { id: "worker-3", type: "general", status: "IDLE", currentJobId: null, lastActiveTime: Date.now(), currentProcess: null },
+  { id: "worker-4", type: "general", status: "IDLE", currentJobId: null, lastActiveTime: Date.now(), currentProcess: null }
 ];
 
 function getAvailableWorker(job) {
@@ -25,12 +25,16 @@ function getAvailableWorker(job) {
 function assignWorker(worker, job) {
   worker.status = "BUSY";
   worker.currentJobId = job.id;
+  worker.currentProcess = null; // to be bound
+  worker.lastActiveTime = Date.now();
   job.workerId = worker.id;
 }
 
 function releaseWorker(worker) {
   worker.status = "IDLE";
   worker.currentJobId = null;
+  worker.currentProcess = null;
+  worker.lastActiveTime = Date.now();
 }
 
 module.exports = {

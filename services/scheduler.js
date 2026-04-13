@@ -28,6 +28,7 @@ function runSchedule() {
     // Reserve worker immediately
     workerManager.assignWorker(worker, job);
     console.log(`[Scheduler] Job ${job.id} assigned to ${worker.id}`);
+    console.log(`[Scheduler] Job moved to execution`);
     
     // B. Worker Assignment Delay
     const assignmentDelay = Math.random() * 1000;

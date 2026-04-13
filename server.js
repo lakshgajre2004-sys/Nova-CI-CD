@@ -3,6 +3,7 @@ const cors = require('cors');
 const http = require('http'); // HTTP server for socket.io
 const jobRoutes = require('./routes/jobs');
 const workerRoutes = require('./routes/workers');
+const webhookRoutes = require('./routes/webhook');
 const { init } = require('./websocket/socket'); // Socket entry
 
 const app = express();
@@ -17,6 +18,9 @@ app.use('/api/jobs', jobRoutes);
 
 // Workers Endpoint
 app.use('/api/workers', workerRoutes);
+
+// Webhook Endpoint
+app.use('/webhook', webhookRoutes);
 
 // Base route for sanity ping
 app.get('/', (req, res) => {

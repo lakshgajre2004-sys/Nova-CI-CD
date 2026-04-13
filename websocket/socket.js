@@ -52,7 +52,8 @@ function broadcastJobUpdate(job, eventName, stageName = null) {
     status: publicJobData.status,
     currentStage: publicJobData.currentStage,
     stages: publicJobData.stages,
-    progressPercentage
+    progressPercentage,
+    executionType: publicJobData.executionType || 'sequential'
   };
 
   const stageLog = stageName ? ` [Stage: ${stageName}]` : '';
