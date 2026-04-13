@@ -189,7 +189,7 @@
       "repo": "lakshgajre2004-sys/Nova-CI-CD",
       "branch": "main",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "FAILED",
       "currentStage": null,
       "stages": [
         {
@@ -236,6 +236,68 @@
         }
       ],
       "createdAt": "2026-04-13T17:05:39.180Z",
+      "startedAt": "2026-04-13T17:05:40.434Z",
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[Job 0fba6d71] Pipeline started on worker-3",
+        "[Job 0fba6d71] Cloning repository...",
+        "[Job 0fba6d71] Clone failed: fatal: repository 'lakshgajre2004-sys/Nova-CI-CD' does not exist\n"
+      ],
+      "workerId": "worker-3"
+    },
+    "085499d7-0158-420d-b91a-3062dd69d9f4": {
+      "id": "085499d7-0158-420d-b91a-3062dd69d9f4",
+      "repo": "lakshgajre2004-sys/Nova-CI-CD",
+      "branch": "main",
+      "priority": 1,
+      "status": "QUEUED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-13T17:15:57.760Z",
       "startedAt": null,
       "completedAt": null,
       "shouldFail": false,
