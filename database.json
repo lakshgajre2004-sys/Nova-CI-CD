@@ -251,7 +251,7 @@
       "repo": "lakshgajre2004-sys/Nova-CI-CD",
       "branch": "main",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "FAILED",
       "currentStage": null,
       "stages": [
         {
@@ -298,6 +298,690 @@
         }
       ],
       "createdAt": "2026-04-13T17:15:57.760Z",
+      "startedAt": "2026-04-13T17:15:59.392Z",
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[Job 085499d7] Pipeline started on worker-3",
+        "[Job 085499d7] Cloning repository...",
+        "[Job 085499d7] Clone failed: fatal: repository 'lakshgajre2004-sys/Nova-CI-CD' does not exist\n"
+      ],
+      "workerId": "worker-3"
+    },
+    "99b7390e-679b-46ce-af7f-a26cea5c5f57": {
+      "id": "99b7390e-679b-46ce-af7f-a26cea5c5f57",
+      "repo": "lakshgajre2004-sys/Nova-CI-CD",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-13T17:17:19.154Z",
+      "startedAt": null,
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[System] Job failed due to unexpected server restart."
+      ]
+    },
+    "325f393b-0e08-495c-add7-ef4131064bba": {
+      "id": "325f393b-0e08-495c-add7-ef4131064bba",
+      "repo": "lakshgajre2004-sys/Nova-CI-CD",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T12:54:14.777Z",
+      "startedAt": "2026-04-21T12:54:16.769Z",
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[Job 325f393b] Pipeline started on worker-3",
+        "[Job 325f393b] Cloning repository...",
+        "[Job 325f393b] Clone failed: fatal: repository 'lakshgajre2004-sys/Nova-CI-CD' does not exist\n"
+      ],
+      "workerId": "worker-3"
+    },
+    "205c8d2f-5adc-4bd1-aab1-ad8590cb4798": {
+      "id": "205c8d2f-5adc-4bd1-aab1-ad8590cb4798",
+      "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "COMPLETED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T13:00:57.445Z",
+          "endTime": "2026-04-21T13:01:00.451Z"
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T13:01:00.453Z",
+          "endTime": "2026-04-21T13:01:00.563Z"
+        },
+        {
+          "name": "Build",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T13:01:00.564Z",
+          "endTime": "2026-04-21T13:01:00.599Z"
+        },
+        {
+          "name": "Test",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T13:01:00.601Z",
+          "endTime": "2026-04-21T13:01:00.662Z"
+        },
+        {
+          "name": "Security Scan",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T13:01:00.664Z",
+          "endTime": "2026-04-21T13:01:03.668Z"
+        },
+        {
+          "name": "Docker Build",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T13:01:03.669Z",
+          "endTime": "2026-04-21T13:01:03.688Z"
+        },
+        {
+          "name": "Push to Registry",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T13:01:03.691Z",
+          "endTime": "2026-04-21T13:01:06.699Z"
+        }
+      ],
+      "createdAt": "2026-04-21T13:00:54.143Z",
+      "startedAt": "2026-04-21T13:00:55.923Z",
+      "completedAt": "2026-04-21T13:01:06.701Z",
+      "shouldFail": false,
+      "logs": [
+        "[Job 205c8d2f] Pipeline started on worker-3",
+        "[Job 205c8d2f] Cloning repository...",
+        "[Job 205c8d2f] Repository cloned",
+        "[Job 205c8d2f] Stage 'Fetch Code' started",
+        "[Job 205c8d2f] Stage 'Fetch Code' completed",
+        "[Job 205c8d2f] Stage 'Install Dependencies' started",
+        "[Job 205c8d2f] [Docker] Running: npm install inside node:18",
+        "[Job 205c8d2f] Stage 'Install Dependencies' completed",
+        "[Job 205c8d2f] Stage 'Build' started",
+        "[Job 205c8d2f] [Docker] Running: npm run build inside node:18",
+        "[Job 205c8d2f] Stage 'Build' completed",
+        "[Job 205c8d2f] Stage 'Test' started",
+        "[Job 205c8d2f] [Docker] Running: npm test inside node:18",
+        "[Job 205c8d2f] Stage 'Test' completed",
+        "[Job 205c8d2f] Stage 'Security Scan' started",
+        "[Job 205c8d2f] Stage 'Security Scan' completed",
+        "[Job 205c8d2f] Stage 'Docker Build' started",
+        "[Job 205c8d2f] [Docker] Running: npm run build inside node:18",
+        "[Job 205c8d2f] Stage 'Docker Build' completed",
+        "[Job 205c8d2f] Stage 'Push to Registry' started",
+        "[Job 205c8d2f] Stage 'Push to Registry' completed",
+        "[Job 205c8d2f] Pipeline finished: COMPLETED"
+      ],
+      "workerId": "worker-3"
+    },
+    "1faf6efe-2a66-4a30-8cf8-7e188c5ba65d": {
+      "id": "1faf6efe-2a66-4a30-8cf8-7e188c5ba65d",
+      "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T14:20:38.492Z",
+      "startedAt": null,
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[System] Job failed due to unexpected server restart."
+      ]
+    },
+    "fdc4f7d7-b548-4fbd-9f8e-42e394d81853": {
+      "id": "fdc4f7d7-b548-4fbd-9f8e-42e394d81853",
+      "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T14:29:17.530Z",
+      "startedAt": null,
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[System] Job failed due to unexpected server restart."
+      ]
+    },
+    "cbabec2c-6746-4d3c-ab1f-c8fb5ea2b5da": {
+      "id": "cbabec2c-6746-4d3c-ab1f-c8fb5ea2b5da",
+      "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:41:54.870Z",
+          "endTime": "2026-04-21T14:41:54.872Z"
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:41:54.873Z",
+          "endTime": "2026-04-21T14:42:01.556Z"
+        },
+        {
+          "name": "Build",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:42:01.558Z",
+          "endTime": "2026-04-21T14:42:02.450Z"
+        },
+        {
+          "name": "Test",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:42:02.451Z",
+          "endTime": "2026-04-21T14:42:03.025Z"
+        },
+        {
+          "name": "Security Scan",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:42:03.026Z",
+          "endTime": "2026-04-21T14:42:03.027Z"
+        },
+        {
+          "name": "Docker Build",
+          "status": "FAILED",
+          "startTime": "2026-04-21T14:42:03.028Z",
+          "endTime": "2026-04-21T14:42:06.399Z"
+        },
+        {
+          "name": "Run Container",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T14:41:51.224Z",
+      "startedAt": "2026-04-21T14:41:53.297Z",
+      "completedAt": "2026-04-21T14:42:06.400Z",
+      "shouldFail": false,
+      "logs": [
+        "[Job cbabec2c] [log] Pipeline started on worker-3",
+        "[Job cbabec2c] [stage_started]",
+        "[Job cbabec2c] [log] Cloning repository...",
+        "[Job cbabec2c] [log] Repository cloned",
+        "[Job cbabec2c] [stage_completed]",
+        "[Job cbabec2c] [stage_started]",
+        "[Job cbabec2c] [log] Stage 'Fetch Code' started",
+        "[Job cbabec2c] [log] Stage 'Fetch Code' completed",
+        "[Job cbabec2c] [stage_completed]",
+        "[Job cbabec2c] [stage_started]",
+        "[Job cbabec2c] [log] Stage 'Install Dependencies' started",
+        "[Job cbabec2c] [log] added 91 packages, and audited 92 packages in 6s",
+        "[Job cbabec2c] [log] 25 packages are looking for funding\n  run `npm fund` for details",
+        "[Job cbabec2c] [log] 1 high severity vulnerability\n\nTo address all issues, run:\n  npm audit fix\n\nRun `npm audit` for details.",
+        "[Job cbabec2c] [log] Stage 'Install Dependencies' completed",
+        "[Job cbabec2c] [stage_completed]",
+        "[Job cbabec2c] [stage_started]",
+        "[Job cbabec2c] [log] Stage 'Build' started",
+        "[Job cbabec2c] [log] > nova@1.0.0 build\n> echo \"Build step\"",
+        "[Job cbabec2c] [log] \"Build step\"",
+        "[Job cbabec2c] [log] Stage 'Build' completed",
+        "[Job cbabec2c] [stage_completed]",
+        "[Job cbabec2c] [stage_started]",
+        "[Job cbabec2c] [log] Stage 'Test' started",
+        "[Job cbabec2c] [log] > nova@1.0.0 test\n> echo \"No tests yet\"",
+        "[Job cbabec2c] [log] \"No tests yet\"",
+        "[Job cbabec2c] [log] Stage 'Test' completed",
+        "[Job cbabec2c] [stage_completed]",
+        "[Job cbabec2c] [stage_started]",
+        "[Job cbabec2c] [log] Stage 'Security Scan' started",
+        "[Job cbabec2c] [log] Running basic security scan...",
+        "[Job cbabec2c] [log] Stage 'Security Scan' completed",
+        "[Job cbabec2c] [stage_completed]",
+        "[Job cbabec2c] [stage_started]",
+        "[Job cbabec2c] [log] Stage 'Docker Build' started",
+        "[Job cbabec2c] [log] Checking Docker engine...",
+        "[Job cbabec2c] [log] Client:\n Version:    29.4.0\n Context:    desktop-linux\n Debug Mode: false\n Plugins:\n  agent: Docker AI Agent Runner (Docker Inc.)\n    Version:  v1.42.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-agent.exe\n  ai: Docker AI Agent - Ask Gordon (Docker Inc.)\n    Version:  v1.20.2\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-ai.exe\n  buildx: Docker Buildx (Docker Inc.)\n    Version:  v0.33.0-desktop.1\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-buildx.exe\n  compose: Docker Compose (Docker Inc.)\n    Version:  v5.1.1\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-compose.exe\n  debug: Get a shell into any image or container (Docker Inc.)\n    Version:  0.0.47\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-debug.exe\n  desktop: Docker Desktop commands (Docker Inc.)\n    Version:  v0.3.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-desktop.exe",
+        "[Job cbabec2c] [log] dhi: CLI for managing Docker Hardened Images (Docker Inc.)\n    Version:  v0.0.2\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-dhi.exe\n  extension: Manages Docker extensions (Docker Inc.)\n    Version:  v0.2.31\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-extension.exe\n  init: Creates Docker-related starter files for your project (Docker Inc.)\n    Version:  v1.4.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-init.exe\n  mcp: Docker MCP Plugin (Docker Inc.)\n    Version:  v0.40.3\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-mcp.exe\n  model: Docker Model Runner (Docker Inc.)\n    Version:  v1.1.29\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-model.exe\n  offload: Docker Offload (Docker Inc.)\n    Version:  v0.5.82\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-offload.exe\n  pass: Docker Pass Secrets Manager Plugin (beta) (Docker Inc.)\n    Version:  v0.0.25\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-pass.exe\n  sandbox: Docker Sandbox (Docker Inc.)\n    Version:  v0.12.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-sandbox.exe\n  sbom: View the packaged-based Software Bill Of Materials (SBOM) for an image (Anchore Inc.)\n    Version:  0.6.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-sbom.exe\n  scout: Docker Scout (Docker Inc.)\n    Version:  v1.20.3\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-scout.exe\n\nServer:\n Containers: 2\n  Running: 0\n  Paused: 0\n  Stopped: 2\n Images: 1\n Server Version: 29.4.0\n Storage Driver: overlayfs\n  driver-type: io.containerd.snapshotter.v1\n Logging Driver: json-file\n Cgroup Driver: cgroupfs\n Cgroup Version: 2\n Plugins:\n  Volume: local\n  Network: bridge host ipvlan macvlan null overlay\n  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog\n CDI spec directories:\n  /etc/cdi\n  /var/run/cdi\n Discovered Devices:\n  cdi: docker.com/gpu=webgpu\n Swarm: inactive\n Runtimes: io.containerd.runc.v2 nvidia runc\n Default Runtime: runc\n Init Binary: docker-init\n containerd version: dea7da592f5d1d2b7755e3a161be07f43fad8f75\n runc version: v1.3.4-0-gd6d73eb8\n init version: de40ad0\n Security Options:\n  seccomp\n   Profile: builtin\n  cgroupns\n Kernel Version: 6.6.87.2-microsoft-standard-WSL2\n Operating System: Docker Desktop\n OSType: linux\n Architecture: x86_64\n CPUs: 12",
+        "[Job cbabec2c] [log] Total Memory: 3.536GiB\n Name: docker-desktop\n ID: db61204f-ad86-4433-b24b-6ff7b7e7111b\n Docker Root Dir: /var/lib/docker\n Debug Mode: false\n HTTP Proxy: http.docker.internal:3128\n HTTPS Proxy: http.docker.internal:3128\n No Proxy: hubproxy.docker.internal\n Labels:\n  com.docker.desktop.address=npipe://\\\\.\\pipe\\docker_cli\n Experimental: false\n Insecure Registries:\n  hubproxy.docker.internal:5555",
+        "[Job cbabec2c] [log] 127.0.0.0/8\n  ::1/128\n Live Restore Enabled: false\n Firewall Backend: iptables",
+        "[Job cbabec2c] [log] Building Docker image: nova-ci-cd",
+        "[Job cbabec2c] [log] #0 building with \"desktop-linux\" instance using docker driver\n\n#1 [internal] load build definition from Dockerfile",
+        "[Job cbabec2c] [log] #1 transferring dockerfile: 2B 0.0s done",
+        "[Job cbabec2c] [log] #1 DONE 0.1s",
+        "[Job cbabec2c] [log] ERROR: failed to build: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory",
+        "[Job cbabec2c] [stage_failed]",
+        "[Job cbabec2c] [log] ERROR: docker failed with code 1",
+        "[Job cbabec2c] [log] Pipeline finished: FAILED"
+      ],
+      "workerId": "worker-3"
+    },
+    "77c6ff8b-1471-4686-a204-b97f33b26ad0": {
+      "id": "77c6ff8b-1471-4686-a204-b97f33b26ad0",
+      "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:44:08.885Z",
+          "endTime": "2026-04-21T14:44:08.886Z"
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:44:08.887Z",
+          "endTime": "2026-04-21T14:44:13.935Z"
+        },
+        {
+          "name": "Build",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:44:13.937Z",
+          "endTime": "2026-04-21T14:44:14.786Z"
+        },
+        {
+          "name": "Test",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:44:14.787Z",
+          "endTime": "2026-04-21T14:44:15.531Z"
+        },
+        {
+          "name": "Security Scan",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:44:15.532Z",
+          "endTime": "2026-04-21T14:44:15.533Z"
+        },
+        {
+          "name": "Docker Build",
+          "status": "FAILED",
+          "startTime": "2026-04-21T14:44:15.533Z",
+          "endTime": "2026-04-21T14:44:19.450Z"
+        },
+        {
+          "name": "Run Container",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T14:44:05.630Z",
+      "startedAt": "2026-04-21T14:44:07.276Z",
+      "completedAt": "2026-04-21T14:44:19.451Z",
+      "shouldFail": false,
+      "logs": [
+        "[Job 77c6ff8b] [log] Pipeline started on worker-3",
+        "[Job 77c6ff8b] [stage_started]",
+        "[Job 77c6ff8b] [log] Cloning repository...",
+        "[Job 77c6ff8b] [log] Repository cloned",
+        "[Job 77c6ff8b] [stage_completed]",
+        "[Job 77c6ff8b] [stage_started]",
+        "[Job 77c6ff8b] [log] Stage 'Fetch Code' started",
+        "[Job 77c6ff8b] [log] Stage 'Fetch Code' completed",
+        "[Job 77c6ff8b] [stage_completed]",
+        "[Job 77c6ff8b] [stage_started]",
+        "[Job 77c6ff8b] [log] Stage 'Install Dependencies' started",
+        "[Job 77c6ff8b] [log] added 91 packages, and audited 92 packages in 4s",
+        "[Job 77c6ff8b] [log] 25 packages are looking for funding\n  run `npm fund` for details",
+        "[Job 77c6ff8b] [log] 1 high severity vulnerability\n\nTo address all issues, run:\n  npm audit fix\n\nRun `npm audit` for details.",
+        "[Job 77c6ff8b] [log] Stage 'Install Dependencies' completed",
+        "[Job 77c6ff8b] [stage_completed]",
+        "[Job 77c6ff8b] [stage_started]",
+        "[Job 77c6ff8b] [log] Stage 'Build' started",
+        "[Job 77c6ff8b] [log] > nova@1.0.0 build\n> echo \"Build step\"",
+        "[Job 77c6ff8b] [log] \"Build step\"",
+        "[Job 77c6ff8b] [log] Stage 'Build' completed",
+        "[Job 77c6ff8b] [stage_completed]",
+        "[Job 77c6ff8b] [stage_started]",
+        "[Job 77c6ff8b] [log] Stage 'Test' started",
+        "[Job 77c6ff8b] [log] > nova@1.0.0 test\n> echo \"No tests yet\"",
+        "[Job 77c6ff8b] [log] \"No tests yet\"",
+        "[Job 77c6ff8b] [log] Stage 'Test' completed",
+        "[Job 77c6ff8b] [stage_completed]",
+        "[Job 77c6ff8b] [stage_started]",
+        "[Job 77c6ff8b] [log] Stage 'Security Scan' started",
+        "[Job 77c6ff8b] [log] Running basic security scan...",
+        "[Job 77c6ff8b] [log] Stage 'Security Scan' completed",
+        "[Job 77c6ff8b] [stage_completed]",
+        "[Job 77c6ff8b] [stage_started]",
+        "[Job 77c6ff8b] [log] Stage 'Docker Build' started",
+        "[Job 77c6ff8b] [log] Checking Docker engine...",
+        "[Job 77c6ff8b] [log] Client:\n Version:    29.4.0\n Context:    desktop-linux\n Debug Mode: false\n Plugins:\n  agent: Docker AI Agent Runner (Docker Inc.)\n    Version:  v1.42.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-agent.exe\n  ai: Docker AI Agent - Ask Gordon (Docker Inc.)\n    Version:  v1.20.2\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-ai.exe\n  buildx: Docker Buildx (Docker Inc.)\n    Version:  v0.33.0-desktop.1\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-buildx.exe\n  compose: Docker Compose (Docker Inc.)\n    Version:  v5.1.1\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-compose.exe\n  debug: Get a shell into any image or container (Docker Inc.)\n    Version:  0.0.47\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-debug.exe\n  desktop: Docker Desktop commands (Docker Inc.)\n    Version:  v0.3.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-desktop.exe\n  dhi: CLI for managing Docker Hardened Images (Docker Inc.)\n    Version:  v0.0.2\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-dhi.exe\n  extension: Manages Docker extensions (Docker Inc.)\n    Version:  v0.2.31\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-extension.exe\n  init: Creates Docker-related starter files for your project (Docker Inc.)",
+        "[Job 77c6ff8b] [log] Version:  v1.4.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-init.exe\n  mcp: Docker MCP Plugin (Docker Inc.)\n    Version:  v0.40.3\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-mcp.exe\n  model: Docker Model Runner (Docker Inc.)\n    Version:  v1.1.29\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-model.exe\n  offload: Docker Offload (Docker Inc.)\n    Version:  v0.5.82\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-offload.exe\n  pass: Docker Pass Secrets Manager Plugin (beta) (Docker Inc.)\n    Version:  v0.0.25\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-pass.exe\n  sandbox: Docker Sandbox (Docker Inc.)\n    Version:  v0.12.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-sandbox.exe\n  sbom: View the packaged-based Software Bill Of Materials (SBOM) for an image (Anchore Inc.)\n    Version:  0.6.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-sbom.exe\n  scout: Docker Scout (Docker Inc.)\n    Version:  v1.20.3\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-scout.exe\n\nServer:\n Containers: 2\n  Running: 0\n  Paused: 0\n  Stopped: 2\n Images: 1\n Server Version: 29.4.0\n Storage Driver: overlayfs\n  driver-type: io.containerd.snapshotter.v1\n Logging Driver: json-file\n Cgroup Driver: cgroupfs\n Cgroup Version: 2\n Plugins:\n  Volume: local\n  Network: bridge host ipvlan macvlan null overlay\n  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog\n CDI spec directories:\n  /etc/cdi\n  /var/run/cdi\n Discovered Devices:\n  cdi: docker.com/gpu=webgpu\n Swarm: inactive\n Runtimes: io.containerd.runc.v2 nvidia runc\n Default Runtime: runc\n Init Binary: docker-init\n containerd version: dea7da592f5d1d2b7755e3a161be07f43fad8f75\n runc version: v1.3.4-0-gd6d73eb8\n init version: de40ad0\n Security Options:\n  seccomp\n   Profile: builtin\n  cgroupns\n Kernel Version: 6.6.87.2-microsoft-standard-WSL2\n Operating System: Docker Desktop\n OSType: linux\n Architecture: x86_64\n CPUs: 12",
+        "[Job 77c6ff8b] [log] Total Memory: 3.536GiB\n Name: docker-desktop\n ID: db61204f-ad86-4433-b24b-6ff7b7e7111b\n Docker Root Dir: /var/lib/docker\n Debug Mode: false",
+        "[Job 77c6ff8b] [log] HTTP Proxy: http.docker.internal:3128\n HTTPS Proxy: http.docker.internal:3128\n No Proxy: hubproxy.docker.internal\n Labels:\n  com.docker.desktop.address=npipe://\\\\.\\pipe\\docker_cli\n Experimental: false\n Insecure Registries:\n  hubproxy.docker.internal:5555\n  127.0.0.0/8\n  ::1/128\n Live Restore Enabled: false\n Firewall Backend: iptables",
+        "[Job 77c6ff8b] [log] Building Docker image: nova-ci-cd",
+        "[Job 77c6ff8b] [log] #0 building with \"desktop-linux\" instance using docker driver",
+        "[Job 77c6ff8b] [log] #1 [internal] load build definition from Dockerfile\n#1 transferring dockerfile: 0.0s",
+        "[Job 77c6ff8b] [log] #1 transferring dockerfile: 2B 0.0s done\n#1 DONE 0.1s",
+        "[Job 77c6ff8b] [log] ERROR: failed to build: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory",
+        "[Job 77c6ff8b] [stage_failed]",
+        "[Job 77c6ff8b] [log] ERROR: docker failed with code 1",
+        "[Job 77c6ff8b] [log] Pipeline finished: FAILED"
+      ],
+      "workerId": "worker-3"
+    },
+    "bf259566-80ea-434d-8eef-0502ad7e993c": {
+      "id": "bf259566-80ea-434d-8eef-0502ad7e993c",
+      "repo": "lakshgajre2004-sys/Nova-CI-CD",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Run Container",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T14:51:21.469Z",
+      "startedAt": "2026-04-21T14:51:23.410Z",
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[Job bf259566] [log] Pipeline started on worker-3",
+        "[Job bf259566] [stage_started]",
+        "[Job bf259566] [log] Cloning repository...",
+        "[Job bf259566] [stage_failed]",
+        "[Job bf259566] [log] Clone failed: fatal: repository 'lakshgajre2004-sys/Nova-CI-CD' does not exist\n"
+      ],
+      "workerId": "worker-3"
+    },
+    "6937f604-17cc-4c51-bcb9-97c023e1a07e": {
+      "id": "6937f604-17cc-4c51-bcb9-97c023e1a07e",
+      "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "QUEUED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Run Container",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T14:56:51.615Z",
       "startedAt": null,
       "completedAt": null,
       "shouldFail": false,

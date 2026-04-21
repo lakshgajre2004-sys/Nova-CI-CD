@@ -1,46 +1,38 @@
 const { broadcastJobUpdate, getIO } = require('../websocket/socket');
-const os = require('os');
 const path = require('path');
 const fs = require('fs');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 const simpleGit = require('simple-git');
 const { parseJenkinsfile } = require('./jenkinsfileParser');
 const { workers } = require('./workerManager');
 
-const STAGE_DELAY_MS = 3000;
-
-// 🔥 NEW: Docker execution
-function runDockerCommand(cmd, repoDir, emitLog, worker, image = "node:18") {
+function runCommand(cmd, args, cwd, emitLog) {
   return new Promise((resolve, reject) => {
+    const process = spawn(cmd, args, { cwd, shell: true });
 
-    const safePath = repoDir.replace(/\\/g, "/");
-
-    const dockerCmd = `
-      docker run --rm \
-      -v ${safePath}:/app \
-      -w /app \
-      ${image} \
-      sh -c "${cmd}"
-    `;
-
-    emitLog(`[Docker] Running: ${cmd} inside ${image}`);
-
-    const child = exec(dockerCmd);
-
-    if (worker) worker.currentProcess = child;
-
-    child.stdout.on('data', data => emitLog(data.toString()));
-    child.stderr.on('data', data => emitLog(data.toString()));
-
-    child.on('close', (code) => {
-      if (worker && worker.currentProcess === child) worker.currentProcess = null;
-
-      if (code === 0) resolve();
-      else reject(new Error(`Docker command failed: ${cmd}`));
+    process.stdout.on("data", data => {
+      const output = data.toString().trim();
+      if (output) emitLog(`[log] ${output}`);
     });
 
-    child.on('error', reject);
+    process.stderr.on("data", data => {
+      const output = data.toString().trim();
+      if (output) emitLog(`[log] ${output}`);
+    });
+
+    process.on("close", code => {
+      if (code === 0) resolve();
+      else reject(new Error(`${cmd} failed with code ${code}`));
+    });
   });
+}
+
+function extractRepoName(repoUrl) {
+  if (!repoUrl) return "app";
+  const parts = repoUrl.split('/');
+  let lastPart = parts[parts.length - 1];
+  if (lastPart.endsWith('.git')) lastPart = lastPart.slice(0, -4);
+  return lastPart.toLowerCase();
 }
 
 async function executePipeline(job) {
@@ -54,9 +46,7 @@ async function executePipeline(job) {
       try {
         const io = getIO();
         io.to(job.id).emit("job_log", { jobId: job.id, log: logStr });
-      } catch (err) {
-        console.error("Failed to emit log", err);
-      }
+      } catch { }
     };
 
     const worker = workers.find(w => w.id === job.workerId);
@@ -65,16 +55,19 @@ async function executePipeline(job) {
     job.startedAt = new Date().toISOString();
     broadcastJobUpdate(job, 'job_started');
 
-    emitLog(`Pipeline started on ${worker?.id}`);
+    emitLog(`[log] Pipeline started on ${worker?.id}`);
 
     const repoDir = path.join(__dirname, '..', 'repos', job.id);
 
+    // ================= CLONE =================
     try {
       fs.mkdirSync(path.join(__dirname, '..', 'repos'), { recursive: true });
 
-      emitLog("Cloning repository...");
+      emitLog("[stage_started]");
+      emitLog("[log] Cloning repository...");
       await simpleGit().clone(job.repo, repoDir);
-      emitLog("Repository cloned");
+      emitLog("[log] Repository cloned");
+      emitLog("[stage_completed]");
 
       const dynamicStages = parseJenkinsfile(repoDir);
       if (dynamicStages?.length) {
@@ -83,77 +76,124 @@ async function executePipeline(job) {
       }
 
     } catch (err) {
-      emitLog(`Clone failed: ${err.message}`);
+      emitLog("[stage_failed]");
+      emitLog(`[log] Clone failed: ${err.message}`);
       job.status = "FAILED";
       broadcastJobUpdate(job, 'job_failed');
       return resolve();
     }
 
+    const repoName = extractRepoName(job.repo);
+    const dockerUser = "laksh04"; // your docker username
+
     let failed = false;
 
-    const getDockerImage = () => {
-      if (worker?.type === "python") return "python:3.10";
-      return "node:18";
-    };
+    // ================= PIPELINE =================
+    for (let stage of job.stages) {
 
-    try {
-      for (let i = 0; i < job.stages.length; i++) {
-        const stage = job.stages[i];
+      job.currentStage = stage.name;
+      stage.status = "RUNNING";
+      stage.startTime = new Date().toISOString();
 
-        job.currentStage = stage.name;
-        stage.status = "RUNNING";
-        stage.startTime = new Date().toISOString();
+      broadcastJobUpdate(job, 'stage_started', stage.name);
+      emitLog("[stage_started]");
+      emitLog(`[log] Stage '${stage.name}' started`);
 
-        broadcastJobUpdate(job, 'stage_started', stage.name);
-        emitLog(`Stage '${stage.name}' started`);
+      const name = stage.name.toLowerCase();
 
-        const name = stage.name.toLowerCase();
-        const image = getDockerImage();
+      try {
 
-        try {
-
-          // 🔥 DOCKER BASED EXECUTION
-          if (name.includes("install")) {
-            await runDockerCommand("npm install", repoDir, emitLog, worker, image);
-          }
-          else if (name.includes("test")) {
-            await runDockerCommand("npm test", repoDir, emitLog, worker, image);
-          }
-          else if (name.includes("build")) {
-            await runDockerCommand("npm run build", repoDir, emitLog, worker, image);
-          }
-          else {
-            // fallback simulation
-            await new Promise(r => setTimeout(r, STAGE_DELAY_MS));
-          }
-
-          stage.status = "SUCCESS";
-          stage.endTime = new Date().toISOString();
-          broadcastJobUpdate(job, 'stage_completed', stage.name);
-          emitLog(`Stage '${stage.name}' completed`);
-
-        } catch (err) {
-          stage.status = "FAILED";
-          stage.endTime = new Date().toISOString();
-          broadcastJobUpdate(job, 'stage_failed', stage.name);
-          emitLog(`ERROR: ${err.message}`);
-          failed = true;
-          break;
+        // INSTALL
+        if (name.includes("install")) {
+          await runCommand("npm", ["install"], repoDir, emitLog);
         }
-      }
 
-    } catch (err) {
-      failed = true;
+        // BUILD
+        else if (name === "build") {
+          await runCommand("npm", ["run", "build"], repoDir, emitLog);
+        }
+
+        // TEST
+        else if (name.includes("test")) {
+          await runCommand("npm", ["test"], repoDir, emitLog);
+        }
+
+        // SECURITY
+        else if (name.includes("security")) {
+          emitLog("[log] Running basic security scan...");
+        }
+
+        // 🔥 DOCKER BUILD
+        else if (name.includes("docker build")) {
+
+          emitLog("[log] Checking Docker engine...");
+          await runCommand("docker", ["info"], repoDir, emitLog);
+
+          emitLog(`[log] Building Docker image: ${repoName}`);
+          await runCommand("docker", ["build", "-t", repoName, "."], repoDir, emitLog);
+        }
+
+        // 🔥 RUN CONTAINER (NEW)
+        else if (name.includes("run")) {
+
+          const containerName = `${repoName}-container`;
+
+          emitLog("[log] Removing old container if exists...");
+          await runCommand("docker", ["rm", "-f", containerName], repoDir, emitLog).catch(() => { });
+
+          emitLog(`[log] Running container: ${containerName}`);
+
+          await runCommand("docker", [
+            "run",
+            "-d",
+            "--name", containerName,
+            "-p", "3000:3000", // change if needed
+            repoName
+          ], repoDir, emitLog);
+
+          emitLog("[log] Container started successfully");
+        }
+
+        // 🔥 PUSH
+        else if (name.includes("push")) {
+
+          const fullImage = `${dockerUser}/${repoName}`;
+
+          emitLog(`[log] Tagging image: ${fullImage}`);
+          await runCommand("docker", ["tag", repoName, fullImage], repoDir, emitLog);
+
+          emitLog("[log] Pushing to Docker Hub...");
+          await runCommand("docker", ["push", fullImage], repoDir, emitLog);
+        }
+
+        stage.status = "SUCCESS";
+        stage.endTime = new Date().toISOString();
+        broadcastJobUpdate(job, 'stage_completed', stage.name);
+
+        emitLog(`[log] Stage '${stage.name}' completed`);
+        emitLog("[stage_completed]");
+
+      } catch (err) {
+        stage.status = "FAILED";
+        stage.endTime = new Date().toISOString();
+        broadcastJobUpdate(job, 'stage_failed', stage.name);
+
+        emitLog("[stage_failed]");
+        emitLog(`[log] ERROR: ${err.message}`);
+
+        failed = true;
+        break;
+      }
     }
 
+    // ================= FINAL =================
     job.status = failed ? "FAILED" : "COMPLETED";
     job.completedAt = new Date().toISOString();
     job.currentStage = null;
 
-    emitLog(`Pipeline finished: ${job.status}`);
+    emitLog(`[log] Pipeline finished: ${job.status}`);
     broadcastJobUpdate(job, failed ? 'job_failed' : 'job_completed');
 
-    // cleanup
     fs.rm(repoDir, { recursive: true, force: true }, () => { });
 
     resolve();

@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid');
+const uuidv4 = require('uuid').v4;
 const store = require('../models/JobStore');
 const { parseStages } = require('../services/jenkinsfileParser');
 const { schedule } = require('../services/scheduler');
