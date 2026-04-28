@@ -929,6 +929,672 @@
       "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
       "branch": "main",
       "priority": 1,
+      "status": "COMPLETED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:56:55.051Z",
+          "endTime": "2026-04-21T14:56:55.053Z"
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:56:55.055Z",
+          "endTime": "2026-04-21T14:57:00.799Z"
+        },
+        {
+          "name": "Build",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:57:00.800Z",
+          "endTime": "2026-04-21T14:57:01.653Z"
+        },
+        {
+          "name": "Test",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:57:01.654Z",
+          "endTime": "2026-04-21T14:57:02.383Z"
+        },
+        {
+          "name": "Security Scan",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:57:02.384Z",
+          "endTime": "2026-04-21T14:57:02.384Z"
+        },
+        {
+          "name": "Docker Build",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:57:02.385Z",
+          "endTime": "2026-04-21T14:57:34.651Z"
+        },
+        {
+          "name": "Run Container",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:57:34.654Z",
+          "endTime": "2026-04-21T14:57:38.581Z"
+        },
+        {
+          "name": "Push to Registry",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T14:57:38.586Z",
+          "endTime": "2026-04-21T14:59:02.931Z"
+        }
+      ],
+      "createdAt": "2026-04-21T14:56:51.615Z",
+      "startedAt": "2026-04-21T14:56:53.266Z",
+      "completedAt": "2026-04-21T14:59:02.932Z",
+      "shouldFail": false,
+      "logs": [
+        "[Job 6937f604] [log] Pipeline started on worker-3",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Cloning repository...",
+        "[Job 6937f604] [log] Repository cloned",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Stage 'Fetch Code' started",
+        "[Job 6937f604] [log] Stage 'Fetch Code' completed",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Stage 'Install Dependencies' started",
+        "[Job 6937f604] [log] added 91 packages, and audited 92 packages in 5s",
+        "[Job 6937f604] [log] 25 packages are looking for funding\n  run `npm fund` for details",
+        "[Job 6937f604] [log] 1 high severity vulnerability\n\nTo address all issues, run:\n  npm audit fix\n\nRun `npm audit` for details.",
+        "[Job 6937f604] [log] Stage 'Install Dependencies' completed",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Stage 'Build' started",
+        "[Job 6937f604] [log] > nova@1.0.0 build\n> echo \"Build step\"",
+        "[Job 6937f604] [log] \"Build step\"",
+        "[Job 6937f604] [log] Stage 'Build' completed",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Stage 'Test' started",
+        "[Job 6937f604] [log] > nova@1.0.0 test\n> echo \"No tests yet\"",
+        "[Job 6937f604] [log] \"No tests yet\"",
+        "[Job 6937f604] [log] Stage 'Test' completed",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Stage 'Security Scan' started",
+        "[Job 6937f604] [log] Running basic security scan...",
+        "[Job 6937f604] [log] Stage 'Security Scan' completed",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Stage 'Docker Build' started",
+        "[Job 6937f604] [log] Checking Docker engine...",
+        "[Job 6937f604] [log] Client:\n Version:    29.4.0\n Context:    desktop-linux\n Debug Mode: false\n Plugins:\n  agent: Docker AI Agent Runner (Docker Inc.)\n    Version:  v1.42.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-agent.exe\n  ai: Docker AI Agent - Ask Gordon (Docker Inc.)\n    Version:  v1.20.2\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-ai.exe\n  buildx: Docker Buildx (Docker Inc.)\n    Version:  v0.33.0-desktop.1\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-buildx.exe\n  compose: Docker Compose (Docker Inc.)\n    Version:  v5.1.1\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-compose.exe\n  debug: Get a shell into any image or container (Docker Inc.)\n    Version:  0.0.47\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-debug.exe\n  desktop: Docker Desktop commands (Docker Inc.)\n    Version:  v0.3.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-desktop.exe\n  dhi: CLI for managing Docker Hardened Images (Docker Inc.)\n    Version:  v0.0.2\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-dhi.exe\n  extension: Manages Docker extensions (Docker Inc.)\n    Version:  v0.2.31\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-extension.exe\n  init: Creates Docker-related starter files for your project (Docker Inc.)\n    Version:  v1.4.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-init.exe",
+        "[Job 6937f604] [log] mcp: Docker MCP Plugin (Docker Inc.)\n    Version:  v0.40.3\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-mcp.exe\n  model: Docker Model Runner (Docker Inc.)\n    Version:  v1.1.29\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-model.exe\n  offload: Docker Offload (Docker Inc.)\n    Version:  v0.5.82\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-offload.exe\n  pass: Docker Pass Secrets Manager Plugin (beta) (Docker Inc.)\n    Version:  v0.0.25\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-pass.exe\n  sandbox: Docker Sandbox (Docker Inc.)\n    Version:  v0.12.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-sandbox.exe\n  sbom: View the packaged-based Software Bill Of Materials (SBOM) for an image (Anchore Inc.)\n    Version:  0.6.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-sbom.exe\n  scout: Docker Scout (Docker Inc.)\n    Version:  v1.20.3\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-scout.exe\n\nServer:\n Containers: 2\n  Running: 0\n  Paused: 0\n  Stopped: 2\n Images: 2\n Server Version: 29.4.0\n Storage Driver: overlayfs\n  driver-type: io.containerd.snapshotter.v1\n Logging Driver: json-file\n Cgroup Driver: cgroupfs\n Cgroup Version: 2\n Plugins:\n  Volume: local\n  Network: bridge host ipvlan macvlan null overlay\n  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog\n CDI spec directories:\n  /etc/cdi\n  /var/run/cdi\n Discovered Devices:\n  cdi: docker.com/gpu=webgpu\n Swarm: inactive\n Runtimes: io.containerd.runc.v2 nvidia runc\n Default Runtime: runc\n Init Binary: docker-init\n containerd version: dea7da592f5d1d2b7755e3a161be07f43fad8f75\n runc version: v1.3.4-0-gd6d73eb8\n init version: de40ad0\n Security Options:\n  seccomp\n   Profile: builtin\n  cgroupns\n Kernel Version: 6.6.87.2-microsoft-standard-WSL2\n Operating System: Docker Desktop\n OSType: linux\n Architecture: x86_64\n CPUs: 12",
+        "[Job 6937f604] [log] Total Memory: 3.536GiB\n Name: docker-desktop\n ID: db61204f-ad86-4433-b24b-6ff7b7e7111b\n Docker Root Dir: /var/lib/docker\n Debug Mode: false\n HTTP Proxy: http.docker.internal:3128\n HTTPS Proxy: http.docker.internal:3128\n No Proxy: hubproxy.docker.internal\n Labels:\n  com.docker.desktop.address=npipe://\\\\.\\pipe\\docker_cli\n Experimental: false\n Insecure Registries:\n  hubproxy.docker.internal:5555\n  127.0.0.0/8\n  ::1/128\n Live Restore Enabled: false\n Firewall Backend: iptables",
+        "[Job 6937f604] [log] Building Docker image: nova-ci-cd",
+        "[Job 6937f604] [log] #0 building with \"desktop-linux\" instance using docker driver\n\n#1 [internal] load build definition from Dockerfile\n#1 transferring dockerfile:",
+        "[Job 6937f604] [log] #1 transferring dockerfile: 163B 0.0s done\n#1 DONE 0.2s\n\n#2 [internal] load metadata for docker.io/library/node:18",
+        "[Job 6937f604] [log] #2 ...\n\n#3 [auth] library/node:pull token for registry-1.docker.io\n#3 DONE 0.0s",
+        "[Job 6937f604] [log] #2 [internal] load metadata for docker.io/library/node:18",
+        "[Job 6937f604] [log] #2 DONE 1.6s",
+        "[Job 6937f604] [log] #4 [internal] load .dockerignore\n#4 transferring context: 2B 0.0s done",
+        "[Job 6937f604] [log] #4 DONE 0.1s",
+        "[Job 6937f604] [log] #5 [internal] load build context",
+        "[Job 6937f604] [log] #5 ...\n\n#6 [1/5] FROM docker.io/library/node:18@sha256:c6ae79e38498325db67193d391e6ec1d224d96c693a8a4d943498556716d3783\n#6 resolve docker.io/library/node:18@sha256:c6ae79e38498325db67193d391e6ec1d224d96c693a8a4d943498556716d3783 0.1s done\n#6 DONE 0.2s\n\n#5 [internal] load build context",
+        "[Job 6937f604] [log] #5 transferring context: 3.90MB 5.0s",
+        "[Job 6937f604] [log] #5 transferring context: 8.77MB 10.0s done",
+        "[Job 6937f604] [log] #5 DONE 10.1s",
+        "[Job 6937f604] [log] #7 [2/5] WORKDIR /app\n#7 CACHED\n\n#8 [3/5] COPY package*.json ./",
+        "[Job 6937f604] [log] #8 DONE 0.9s",
+        "[Job 6937f604] [log] #9 [4/5] RUN npm install",
+        "[Job 6937f604] [log] #9 7.657 \n#9 7.657 added 91 packages, and audited 92 packages in 5s\n#9 7.658 \n#9 7.658 25 packages are looking for funding\n#9 7.658   run `npm fund` for details",
+        "[Job 6937f604] [log] #9 7.664 \n#9 7.664 1 high severity vulnerability\n#9 7.664 \n#9 7.664 To address all issues, run:\n#9 7.664   npm audit fix\n#9 7.664 \n#9 7.664 Run `npm audit` for details.\n#9 7.668 npm notice\n#9 7.668 npm notice New major version of npm available! 10.8.2 -> 11.12.1\n#9 7.668 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.12.1\n#9 7.668 npm notice To update run: npm install -g npm@11.12.1\n#9 7.668 npm notice",
+        "[Job 6937f604] [log] #9 DONE 7.9s",
+        "[Job 6937f604] [log] #10 [5/5] COPY . .",
+        "[Job 6937f604] [log] #10 DONE 1.7s",
+        "[Job 6937f604] [log] #11 exporting to image\n#11 exporting layers",
+        "[Job 6937f604] [log] #11 exporting layers 1.6s done",
+        "[Job 6937f604] [log] #11 exporting manifest sha256:336a26106f6fb16b7543be63d82500d4c5a8a1c7d96ff874359091aff393a8f8 0.0s done\n#11 exporting config sha256:0d4c853640e74d0cea5483d1f0cd67757f5de1b8fbaca7d37dc50423cdec3c3a 0.0s done\n#11 exporting attestation manifest sha256:012163f27ab3ff791075c19c79f06b6cb14c45ef693e8e5eb51fefbae9236cd4",
+        "[Job 6937f604] [log] #11 exporting attestation manifest sha256:012163f27ab3ff791075c19c79f06b6cb14c45ef693e8e5eb51fefbae9236cd4 0.1s done\n#11 exporting manifest list sha256:b8113a823f57bd3e0449301467684628ff426cf70532f32060555281c95b5cbe",
+        "[Job 6937f604] [log] #11 exporting manifest list sha256:b8113a823f57bd3e0449301467684628ff426cf70532f32060555281c95b5cbe 0.0s done\n#11 naming to docker.io/library/nova-ci-cd:latest 0.0s done\n#11 unpacking to docker.io/library/nova-ci-cd:latest",
+        "[Job 6937f604] [log] #11 unpacking to docker.io/library/nova-ci-cd:latest 2.8s done",
+        "[Job 6937f604] [log] #11 DONE 4.8s",
+        "[Job 6937f604] [log] Stage 'Docker Build' completed",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Stage 'Run Container' started",
+        "[Job 6937f604] [log] Removing old container if exists...",
+        "[Job 6937f604] [log] Error response from daemon: No such container: nova-ci-cd-container",
+        "[Job 6937f604] [log] Running container: nova-ci-cd-container",
+        "[Job 6937f604] [log] c04784f7bb033a3bb34500e7b4bf3601b518ac5249435acc7558f23843560eee",
+        "[Job 6937f604] [log] Container started successfully",
+        "[Job 6937f604] [log] Stage 'Run Container' completed",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [stage_started]",
+        "[Job 6937f604] [log] Stage 'Push to Registry' started",
+        "[Job 6937f604] [log] Tagging image: laksh04/nova-ci-cd",
+        "[Job 6937f604] [log] Pushing to Docker Hub...",
+        "[Job 6937f604] [log] Using default tag: latest",
+        "[Job 6937f604] [log] The push refers to repository [docker.io/laksh04/nova-ci-cd]",
+        "[Job 6937f604] [log] 969afd6817dd: Waiting",
+        "[Job 6937f604] [log] 969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting",
+        "[Job 6937f604] [log] 3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting",
+        "[Job 6937f604] [log] eabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting",
+        "[Job 6937f604] [log] 3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting",
+        "[Job 6937f604] [log] 344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting",
+        "[Job 6937f604] [log] 3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting",
+        "[Job 6937f604] [log] cda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting",
+        "[Job 6937f604] [log] 5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting",
+        "[Job 6937f604] [log] 79b2f47ad444: Waiting",
+        "[Job 6937f604] [log] 3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting",
+        "[Job 6937f604] [log] eabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting",
+        "[Job 6937f604] [log] eabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting",
+        "[Job 6937f604] [log] 461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting",
+        "[Job 6937f604] [log] 5e3b564b5076:",
+        "[Job 6937f604] [log] Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting",
+        "[Job 6937f604] [log] 461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting",
+        "[Job 6937f604] [log] 3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting",
+        "[Job 6937f604] [log] 5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting",
+        "[Job 6937f604] [log] cda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting",
+        "[Job 6937f604] [log] e23f099911d6: Waiting",
+        "[Job 6937f604] [log] 3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting",
+        "[Job 6937f604] [log] 79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting",
+        "[Job 6937f604] [log] cda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting",
+        "[Job 6937f604] [log] 344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444:",
+        "[Job 6937f604] [log] Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting",
+        "[Job 6937f604] [log] 3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting",
+        "[Job 6937f604] [log] eabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting",
+        "[Job 6937f604] [log] 969afd6817dd: Waiting",
+        "[Job 6937f604] [log] e024a8e14363: Waiting\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting",
+        "[Job 6937f604] [log] c6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\n969afd6817dd: Waiting\ne024a8e14363: Waiting",
+        "[Job 6937f604] [log] 79b2f47ad444: Waiting\n3697be50c98b: Waiting\n37927ed901b1: Waiting\n5e3b564b5076: Waiting\n344e8101608d: Waiting",
+        "[Job 6937f604] [log] 5e3b564b5076: Waiting\n344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting",
+        "[Job 6937f604] [log] e024a8e14363: Waiting\n79b2f47ad444: Waiting\n37927ed901b1: Waiting",
+        "[Job 6937f604] [log] 344e8101608d: Waiting\nc6b30c3f1696: Waiting\n461077a72fb7: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\ncda7f44f2bdd: Waiting\neabeaad7a519: Waiting\ne024a8e14363: Waiting",
+        "[Job 6937f604] [log] 37927ed901b1: Waiting\n5e3b564b5076: Waiting",
+        "[Job 6937f604] [log] eabeaad7a519: Waiting\ne024a8e14363: Waiting",
+        "[Job 6937f604] [log] 37927ed901b1: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting",
+        "[Job 6937f604] [log] cda7f44f2bdd:",
+        "[Job 6937f604] [log] Pushed\n969afd6817dd: Pushed",
+        "[Job 6937f604] [log] 461077a72fb7: Pushed",
+        "[Job 6937f604] [log] e024a8e14363: Pushed",
+        "[Job 6937f604] [log] eabeaad7a519: Pushed",
+        "[Job 6937f604] [log] 3697be50c98b: Pushed",
+        "[Job 6937f604] [log] 344e8101608d: Pushed",
+        "[Job 6937f604] [log] 5e3b564b5076: Pushed",
+        "[Job 6937f604] [log] 37927ed901b1: Pushed",
+        "[Job 6937f604] [log] 3e6b9d1a9511: Pushed",
+        "[Job 6937f604] [log] 79b2f47ad444: Pushed",
+        "[Job 6937f604] [log] e23f099911d6: Pushed",
+        "[Job 6937f604] [log] c6b30c3f1696: Pushed",
+        "[Job 6937f604] [log] latest: digest: sha256:b8113a823f57bd3e0449301467684628ff426cf70532f32060555281c95b5cbe size: 856",
+        "[Job 6937f604] [log] Stage 'Push to Registry' completed",
+        "[Job 6937f604] [stage_completed]",
+        "[Job 6937f604] [log] Pipeline finished: COMPLETED"
+      ],
+      "workerId": "worker-3"
+    },
+    "4883bc9a-36ab-4f12-be21-ba7f1581c33e": {
+      "id": "4883bc9a-36ab-4f12-be21-ba7f1581c33e",
+      "repo": "lakshgajre2004-sys/Nova-CI-CD",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Run Container",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T15:09:23.352Z",
+      "startedAt": "2026-04-21T15:09:28.717Z",
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[Job 4883bc9a] [log] Pipeline started on worker-3",
+        "[Job 4883bc9a] [stage_started]",
+        "[Job 4883bc9a] [log] Cloning repository...",
+        "[Job 4883bc9a] [stage_failed]",
+        "[Job 4883bc9a] [log] Clone failed: fatal: repository 'lakshgajre2004-sys/Nova-CI-CD' does not exist\n"
+      ],
+      "workerId": "worker-3"
+    },
+    "8e70b924-d4d4-41c6-832f-ba7f381a9b2a": {
+      "id": "8e70b924-d4d4-41c6-832f-ba7f381a9b2a",
+      "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "COMPLETED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T15:10:00.458Z",
+          "endTime": "2026-04-21T15:10:00.460Z"
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T15:10:00.460Z",
+          "endTime": "2026-04-21T15:10:03.543Z"
+        },
+        {
+          "name": "Build",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T15:10:03.543Z",
+          "endTime": "2026-04-21T15:10:04.278Z"
+        },
+        {
+          "name": "Test",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T15:10:04.278Z",
+          "endTime": "2026-04-21T15:10:04.776Z"
+        },
+        {
+          "name": "Security Scan",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T15:10:04.777Z",
+          "endTime": "2026-04-21T15:10:04.777Z"
+        },
+        {
+          "name": "Docker Build",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T15:10:04.777Z",
+          "endTime": "2026-04-21T15:10:29.919Z"
+        },
+        {
+          "name": "Run Container",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T15:10:29.919Z",
+          "endTime": "2026-04-21T15:10:31.679Z"
+        },
+        {
+          "name": "Push to Registry",
+          "status": "SUCCESS",
+          "startTime": "2026-04-21T15:10:31.681Z",
+          "endTime": "2026-04-21T15:10:40.875Z"
+        }
+      ],
+      "createdAt": "2026-04-21T15:09:57.566Z",
+      "startedAt": "2026-04-21T15:09:58.851Z",
+      "completedAt": "2026-04-21T15:10:40.878Z",
+      "shouldFail": false,
+      "logs": [
+        "[Job 8e70b924] [log] Pipeline started on worker-3",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Cloning repository...",
+        "[Job 8e70b924] [log] Repository cloned",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Stage 'Fetch Code' started",
+        "[Job 8e70b924] [log] Stage 'Fetch Code' completed",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Stage 'Install Dependencies' started",
+        "[Job 8e70b924] [log] added 91 packages, and audited 92 packages in 3s",
+        "[Job 8e70b924] [log] 24 packages are looking for funding\n  run `npm fund` for details",
+        "[Job 8e70b924] [log] 1 high severity vulnerability\n\nTo address all issues, run:\n  npm audit fix\n\nRun `npm audit` for details.",
+        "[Job 8e70b924] [log] Stage 'Install Dependencies' completed",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Stage 'Build' started",
+        "[Job 8e70b924] [log] > nova@1.0.0 build\n> echo \"Build step\"",
+        "[Job 8e70b924] [log] \"Build step\"",
+        "[Job 8e70b924] [log] Stage 'Build' completed",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Stage 'Test' started",
+        "[Job 8e70b924] [log] > nova@1.0.0 test\n> echo \"No tests yet\"",
+        "[Job 8e70b924] [log] \"No tests yet\"",
+        "[Job 8e70b924] [log] Stage 'Test' completed",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Stage 'Security Scan' started",
+        "[Job 8e70b924] [log] Running basic security scan...",
+        "[Job 8e70b924] [log] Stage 'Security Scan' completed",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Stage 'Docker Build' started",
+        "[Job 8e70b924] [log] Checking Docker engine...",
+        "[Job 8e70b924] [log] Client:\n Version:    29.4.0\n Context:    desktop-linux\n Debug Mode: false\n Plugins:\n  agent: Docker AI Agent Runner (Docker Inc.)\n    Version:  v1.42.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-agent.exe\n  ai: Docker AI Agent - Ask Gordon (Docker Inc.)\n    Version:  v1.20.2\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-ai.exe\n  buildx: Docker Buildx (Docker Inc.)\n    Version:  v0.33.0-desktop.1\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-buildx.exe\n  compose: Docker Compose (Docker Inc.)\n    Version:  v5.1.1\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-compose.exe\n  debug: Get a shell into any image or container (Docker Inc.)\n    Version:  0.0.47\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-debug.exe\n  desktop: Docker Desktop commands (Docker Inc.)\n    Version:  v0.3.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-desktop.exe\n  dhi: CLI for managing Docker Hardened Images (Docker Inc.)\n    Version:  v0.0.2\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-dhi.exe\n  extension: Manages Docker extensions (Docker Inc.)\n    Version:  v0.2.31\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-extension.exe\n  init: Creates Docker-related starter files for your project (Docker Inc.)\n    Version:  v1.4.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-init.exe\n  mcp: Docker MCP Plugin (Docker Inc.)\n    Version:  v0.40.3\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-mcp.exe\n  model: Docker Model Runner (Docker Inc.)\n    Version:  v1.1.29",
+        "[Job 8e70b924] [log] Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-model.exe\n  offload: Docker Offload (Docker Inc.)\n    Version:  v0.5.82\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-offload.exe\n  pass: Docker Pass Secrets Manager Plugin (beta) (Docker Inc.)\n    Version:  v0.0.25\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-pass.exe\n  sandbox: Docker Sandbox (Docker Inc.)\n    Version:  v0.12.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-sandbox.exe\n  sbom: View the packaged-based Software Bill Of Materials (SBOM) for an image (Anchore Inc.)\n    Version:  0.6.0\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-sbom.exe\n  scout: Docker Scout (Docker Inc.)\n    Version:  v1.20.3\n    Path:     C:\\Program Files\\Docker\\cli-plugins\\docker-scout.exe\n\nServer:\n Containers: 3\n  Running: 0\n  Paused: 0\n  Stopped: 3\n Images: 3\n Server Version: 29.4.0\n Storage Driver: overlayfs\n  driver-type: io.containerd.snapshotter.v1\n Logging Driver: json-file\n Cgroup Driver: cgroupfs\n Cgroup Version: 2\n Plugins:\n  Volume: local\n  Network: bridge host ipvlan macvlan null overlay\n  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog\n CDI spec directories:\n  /etc/cdi\n  /var/run/cdi\n Discovered Devices:\n  cdi: docker.com/gpu=webgpu\n Swarm: inactive\n Runtimes: io.containerd.runc.v2 nvidia runc\n Default Runtime: runc\n Init Binary: docker-init\n containerd version: dea7da592f5d1d2b7755e3a161be07f43fad8f75\n runc version: v1.3.4-0-gd6d73eb8\n init version: de40ad0\n Security Options:\n  seccomp\n   Profile: builtin\n  cgroupns\n Kernel Version: 6.6.87.2-microsoft-standard-WSL2\n Operating System: Docker Desktop\n OSType: linux\n Architecture: x86_64\n CPUs: 12",
+        "[Job 8e70b924] [log] Total Memory: 3.536GiB\n Name: docker-desktop\n ID: db61204f-ad86-4433-b24b-6ff7b7e7111b\n Docker Root Dir: /var/lib/docker\n Debug Mode: false",
+        "[Job 8e70b924] [log] HTTP Proxy: http.docker.internal:3128\n HTTPS Proxy: http.docker.internal:3128\n No Proxy: hubproxy.docker.internal\n Labels:\n  com.docker.desktop.address=npipe://\\\\.\\pipe\\docker_cli\n Experimental: false\n Insecure Registries:\n  hubproxy.docker.internal:5555\n  127.0.0.0/8\n  ::1/128\n Live Restore Enabled: false\n Firewall Backend: iptables",
+        "[Job 8e70b924] [log] Building Docker image: nova-ci-cd",
+        "[Job 8e70b924] [log] #0 building with \"desktop-linux\" instance using docker driver\n\n#1 [internal] load build definition from Dockerfile",
+        "[Job 8e70b924] [log] #1 transferring dockerfile: 163B 0.0s done\n#1 DONE 0.1s",
+        "[Job 8e70b924] [log] #2 [internal] load metadata for docker.io/library/node:18",
+        "[Job 8e70b924] [log] #2 ...\n\n#3 [auth] library/node:pull token for registry-1.docker.io\n#3 DONE 0.0s",
+        "[Job 8e70b924] [log] #2 [internal] load metadata for docker.io/library/node:18",
+        "[Job 8e70b924] [log] #2 DONE 1.6s",
+        "[Job 8e70b924] [log] #4 [internal] load .dockerignore\n#4 transferring context: 2B done\n#4 DONE 0.1s",
+        "[Job 8e70b924] [log] #5 [internal] load build context",
+        "[Job 8e70b924] [log] #5 ...\n\n#6 [1/5] FROM docker.io/library/node:18@sha256:c6ae79e38498325db67193d391e6ec1d224d96c693a8a4d943498556716d3783\n#6 resolve docker.io/library/node:18@sha256:c6ae79e38498325db67193d391e6ec1d224d96c693a8a4d943498556716d3783 0.1s done\n#6 DONE 0.1s\n\n#5 [internal] load build context",
+        "[Job 8e70b924] [log] #5 transferring context: 8.50MB 5.1s",
+        "[Job 8e70b924] [log] #5 transferring context: 8.86MB 6.0s done\n#5 DONE 6.0s\n\n#7 [2/5] WORKDIR /app\n#7 CACHED\n\n#8 [3/5] COPY package*.json ./",
+        "[Job 8e70b924] [log] #8 DONE 0.2s",
+        "[Job 8e70b924] [log] #9 [4/5] RUN npm install",
+        "[Job 8e70b924] [log] #9 7.412 \n#9 7.412 added 91 packages, and audited 92 packages in 6s\n#9 7.412 \n#9 7.412 24 packages are looking for funding\n#9 7.412   run `npm fund` for details",
+        "[Job 8e70b924] [log] #9 7.418 \n#9 7.418 1 high severity vulnerability\n#9 7.418 \n#9 7.418 To address all issues, run:\n#9 7.418   npm audit fix\n#9 7.418 \n#9 7.418 Run `npm audit` for details.\n#9 7.421 npm notice\n#9 7.421 npm notice New major version of npm available! 10.8.2 -> 11.12.1\n#9 7.421 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.12.1\n#9 7.421 npm notice To update run: npm install -g npm@11.12.1\n#9 7.421 npm notice",
+        "[Job 8e70b924] [log] #9 DONE 7.6s",
+        "[Job 8e70b924] [log] #10 [5/5] COPY . .",
+        "[Job 8e70b924] [log] #10 DONE 1.4s",
+        "[Job 8e70b924] [log] #11 exporting to image\n#11 exporting layers",
+        "[Job 8e70b924] [log] #11 exporting layers 1.5s done",
+        "[Job 8e70b924] [log] #11 exporting manifest sha256:5dda5133d2e8f6a11292ffd0189173ae9c17ef6dd71643335351b7560c7711c1 0.0s done\n#11 exporting config sha256:4c6920b0429a3a439f4be39d5894574e5752d75019437a63de48fd097505411a 0.0s done\n#11 exporting attestation manifest sha256:5d6e7ebd8f2e64a159e111904d0d4b62c4b9ee4a3fb0c63518a783774281ffde 0.1s done\n#11 exporting manifest list sha256:d1bd34108b13aa7f606b06982a02748407459db8d3357a13f6e94ebc6ca6fb25",
+        "[Job 8e70b924] [log] #11 exporting manifest list sha256:d1bd34108b13aa7f606b06982a02748407459db8d3357a13f6e94ebc6ca6fb25 0.0s done\n#11 naming to docker.io/library/nova-ci-cd:latest 0.0s done\n#11 unpacking to docker.io/library/nova-ci-cd:latest",
+        "[Job 8e70b924] [log] #11 unpacking to docker.io/library/nova-ci-cd:latest 2.5s done",
+        "[Job 8e70b924] [log] #11 DONE 4.3s",
+        "[Job 8e70b924] [log] Stage 'Docker Build' completed",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Stage 'Run Container' started",
+        "[Job 8e70b924] [log] Removing old container if exists...",
+        "[Job 8e70b924] [log] nova-ci-cd-container",
+        "[Job 8e70b924] [log] Running container: nova-ci-cd-container",
+        "[Job 8e70b924] [log] 65a37fc64423f9a8df3dd3e504a9aee290b0014f3173f159ee94eed19a6e5fa2",
+        "[Job 8e70b924] [log] Container started successfully",
+        "[Job 8e70b924] [log] Stage 'Run Container' completed",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [stage_started]",
+        "[Job 8e70b924] [log] Stage 'Push to Registry' started",
+        "[Job 8e70b924] [log] Tagging image: laksh04/nova-ci-cd",
+        "[Job 8e70b924] [log] Pushing to Docker Hub...",
+        "[Job 8e70b924] [log] Using default tag: latest",
+        "[Job 8e70b924] [log] The push refers to repository [docker.io/laksh04/nova-ci-cd]",
+        "[Job 8e70b924] [log] cda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting",
+        "[Job 8e70b924] [log] f62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting",
+        "[Job 8e70b924] [log] 003c7ce5f738: Waiting",
+        "[Job 8e70b924] [log] 3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting",
+        "[Job 8e70b924] [log] 038cb996c6ba: Waiting\ne23f099911d6: Waiting",
+        "[Job 8e70b924] [log] f62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting",
+        "[Job 8e70b924] [log] e23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting",
+        "[Job 8e70b924] [log] e23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting",
+        "[Job 8e70b924] [log] 978fd2ebdd37: Waiting\n038cb996c6ba: Waiting",
+        "[Job 8e70b924] [log] 3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting",
+        "[Job 8e70b924] [log] e024a8e14363: Waiting",
+        "[Job 8e70b924] [log] e23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting",
+        "[Job 8e70b924] [log] 038cb996c6ba: Waiting",
+        "[Job 8e70b924] [log] f62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting",
+        "[Job 8e70b924] [log] 461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting",
+        "[Job 8e70b924] [log] 003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting",
+        "[Job 8e70b924] [log] e23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting",
+        "[Job 8e70b924] [log] 79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting",
+        "[Job 8e70b924] [log] c6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting",
+        "[Job 8e70b924] [log] cda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting",
+        "[Job 8e70b924] [log] cda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting",
+        "[Job 8e70b924] [log] 003c7ce5f738: Waiting\nf62e5fa236bd: Waiting",
+        "[Job 8e70b924] [log] e23f099911d6: Waiting\n3e6b9d1a9511: Waiting",
+        "[Job 8e70b924] [log] 003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\ncda7f44f2bdd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting",
+        "[Job 8e70b924] [log] 37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting\ne024a8e14363: Layer already exists\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\ncda7f44f2bdd: Layer already exists\n461077a72fb7: Waiting",
+        "[Job 8e70b924] [log] 79b2f47ad444: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting",
+        "[Job 8e70b924] [log] 3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\ne23f099911d6: Layer already exists\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting",
+        "[Job 8e70b924] [log] 3697be50c98b: Waiting\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\n461077a72fb7: Waiting\n37927ed901b1: Waiting\nc6b30c3f1696: Waiting\n79b2f47ad444: Waiting",
+        "[Job 8e70b924] [log] 038cb996c6ba: Waiting\n3e6b9d1a9511: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\n461077a72fb7: Layer already exists\n37927ed901b1: Layer already exists\nc6b30c3f1696: Layer already exists\n79b2f47ad444: Waiting\n3697be50c98b: Waiting\n978fd2ebdd37: Waiting",
+        "[Job 8e70b924] [log] 3e6b9d1a9511: Layer already exists\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting\n79b2f47ad444: Layer already exists\n3697be50c98b: Layer already exists\n978fd2ebdd37: Waiting\n038cb996c6ba: Waiting",
+        "[Job 8e70b924] [log] 038cb996c6ba: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting",
+        "[Job 8e70b924] [log] 038cb996c6ba: Waiting\n003c7ce5f738: Waiting\nf62e5fa236bd: Waiting",
+        "[Job 8e70b924] [log] 978fd2ebdd37: Pushed",
+        "[Job 8e70b924] [log] 038cb996c6ba: Pushed",
+        "[Job 8e70b924] [log] f62e5fa236bd: Pushed",
+        "[Job 8e70b924] [log] 003c7ce5f738: Pushed",
+        "[Job 8e70b924] [log] latest: digest: sha256:d1bd34108b13aa7f606b06982a02748407459db8d3357a13f6e94ebc6ca6fb25 size: 856",
+        "[Job 8e70b924] [log] Stage 'Push to Registry' completed",
+        "[Job 8e70b924] [stage_completed]",
+        "[Job 8e70b924] [log] Pipeline finished: COMPLETED"
+      ],
+      "workerId": "worker-3"
+    },
+    "2f273506-9a00-4923-a751-3f7474ca1cf1": {
+      "id": "2f273506-9a00-4923-a751-3f7474ca1cf1",
+      "repo": "https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Run Container",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-21T18:16:58.891Z",
+      "startedAt": null,
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[System] Job failed due to unexpected server restart."
+      ]
+    },
+    "0807361c-461c-41e1-896d-b8d35e33b078": {
+      "id": "0807361c-461c-41e1-896d-b8d35e33b078",
+      "repo": "//https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Run Container",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-28T16:35:51.426Z",
+      "startedAt": "2026-04-28T16:35:53.737Z",
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[Job 0807361c] [log] Pipeline started on worker-3",
+        "[Job 0807361c] [stage_started]",
+        "[Job 0807361c] [log] Cloning repository...",
+        "[Job 0807361c] [stage_failed]",
+        "[Job 0807361c] [log] Clone failed: Cloning into 'C:\\Users\\Laksh\\Nova\\repos\\0807361c-461c-41e1-896d-b8d35e33b078'...\nfatal: protocol '//https' is not supported\n"
+      ],
+      "workerId": "worker-3"
+    },
+    "f733662e-59a7-4d60-b0b9-98c195207167": {
+      "id": "f733662e-59a7-4d60-b0b9-98c195207167",
+      "repo": "//https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
+      "status": "FAILED",
+      "currentStage": null,
+      "stages": [
+        {
+          "name": "Fetch Code",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Install Dependencies",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Test",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Security Scan",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Docker Build",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Run Container",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "name": "Push to Registry",
+          "status": "PENDING",
+          "startTime": null,
+          "endTime": null
+        }
+      ],
+      "createdAt": "2026-04-28T16:36:02.635Z",
+      "startedAt": "2026-04-28T16:36:04.217Z",
+      "completedAt": null,
+      "shouldFail": false,
+      "logs": [
+        "[Job f733662e] [log] Pipeline started on worker-3",
+        "[Job f733662e] [stage_started]",
+        "[Job f733662e] [log] Cloning repository...",
+        "[Job f733662e] [stage_failed]",
+        "[Job f733662e] [log] Clone failed: Cloning into 'C:\\Users\\Laksh\\Nova\\repos\\f733662e-59a7-4d60-b0b9-98c195207167'...\nfatal: protocol '//https' is not supported\n"
+      ],
+      "workerId": "worker-3"
+    },
+    "b0bab8ac-b14a-4925-b705-cff4f7a4e6d8": {
+      "id": "b0bab8ac-b14a-4925-b705-cff4f7a4e6d8",
+      "repo": "//https://github.com/lakshgajre2004-sys/Nova-CI-CD.git",
+      "branch": "main",
+      "priority": 1,
       "status": "QUEUED",
       "currentStage": null,
       "stages": [
@@ -981,7 +1647,7 @@
           "endTime": null
         }
       ],
-      "createdAt": "2026-04-21T14:56:51.615Z",
+      "createdAt": "2026-04-28T16:36:14.697Z",
       "startedAt": null,
       "completedAt": null,
       "shouldFail": false,
