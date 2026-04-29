@@ -1,187 +1,250 @@
 const { broadcastJobUpdate, getIO } = require('../websocket/socket');
-const os = require('os');
 const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 const simpleGit = require('simple-git');
 const { parseJenkinsfile } = require('./jenkinsfileParser');
 
-const STAGE_DELAY_MS = 3000; // Simulate 3 seconds per stage
+const STAGE_DELAY_MS = 3000;
 
-function runCommand(cmd, cwd, emitLog, timeoutMs = 15000) {
+/* =========================
+   RUN COMMAND
+========================= */
+function runCommand(cmd, cwd, emitLog, timeoutMs = 60000) {
   return new Promise((resolve, reject) => {
-    emitLog(`[Execution] Running: ${cmd}`);
+    emitLog(`[Execution] ${cmd}`);
+
     const child = exec(cmd, { cwd, timeout: timeoutMs });
 
-    child.stdout.on('data', (data) => {
-      const lines = data.toString().split('\n');
-      lines.forEach(line => {
-        if (line.trim()) emitLog(line.trim());
-      });
+    child.stdout.on('data', d => {
+      d.toString().split('\n').forEach(l => l.trim() && emitLog(l));
     });
 
-    child.stderr.on('data', (data) => {
-      const lines = data.toString().split('\n');
-      lines.forEach(line => {
-        if (line.trim()) emitLog(line.trim());
-      });
+    child.stderr.on('data', d => {
+      d.toString().split('\n').forEach(l => l.trim() && emitLog(l));
     });
 
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`Command '${cmd}' failed with exit code ${code}`));
-      }
+    child.on('close', code => {
+      code === 0 ? resolve() : reject(new Error(`Failed: ${cmd}`));
     });
 
-    child.on('error', (err) => {
-      reject(err);
-    });
+    child.on('error', reject);
   });
 }
 
+/* =========================
+   DETECT PROJECT TYPE
+========================= */
+function detectBuildType(repoDir) {
+  const pkgPath = path.join(repoDir, 'package.json');
+
+  if (!fs.existsSync(pkgPath)) return "unknown";
+
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+
+  if (pkg.dependencies?.react && pkg.scripts?.build) {
+    if (fs.existsSync(path.join(repoDir, 'vite.config.js'))) return "vite";
+    return "react";
+  }
+
+  if (pkg.main || pkg.scripts?.start) return "node";
+
+  return "unknown";
+}
+
+/* =========================
+   CREATE DOCKERFILE
+========================= */
+function createDockerfile(repoDir, type) {
+  let dockerfile = "";
+
+  if (type === "vite") {
+    dockerfile = `
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+RUN npm install -g serve
+EXPOSE 4000
+CMD ["serve", "-s", "dist", "-l", "4000"]
+`;
+  }
+
+  else if (type === "react") {
+    dockerfile = `
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+RUN npm install -g serve
+EXPOSE 4000
+CMD ["serve", "-s", "build", "-l", "4000"]
+`;
+  }
+
+  else if (type === "node") {
+    dockerfile = `
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+EXPOSE 4000
+CMD ["npm", "start"]
+`;
+  }
+
+  else {
+    dockerfile = `
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install || true
+EXPOSE 4000
+CMD ["node", "server.js"]
+`;
+  }
+
+  fs.writeFileSync(path.join(repoDir, 'Dockerfile'), dockerfile);
+}
+
+/* =========================
+   PIPELINE EXECUTION
+========================= */
 async function executePipeline(job) {
   return new Promise(async (resolve) => {
 
     const emitLog = (msg) => {
-      const logStr = `[Job ${job.id.split('-')[0]}] ${msg}`;
-      if (!job.logs) job.logs = [];
-      job.logs.push(logStr);
+      const log = `[Job ${job?.id?.slice(0, 6)}] ${msg}`;
+      job.logs = job.logs || [];
+      job.logs.push(log);
 
       try {
-        const io = getIO();
-        io.to(job.id).emit("job_log", { jobId: job.id, log: logStr });
-      } catch (err) {
-        console.error("Failed to emit log", err);
-      }
+        getIO().to(job.id).emit("job_log", { jobId: job.id, log });
+      } catch { }
     };
 
-    // Start job
     job.status = "IN_PROGRESS";
     job.startedAt = new Date().toISOString();
     broadcastJobUpdate(job, 'job_started');
-    emitLog("Pipeline execution started");
+    emitLog("Pipeline started");
 
     const repoDir = path.join(__dirname, '..', 'repos', job.id);
-    let repoCloned = false;
 
     try {
-      if (!fs.existsSync(path.join(__dirname, '..', 'repos'))) {
-        fs.mkdirSync(path.join(__dirname, '..', 'repos'), { recursive: true });
-      }
-      emitLog("Cloning repository...");
-      const git = simpleGit();
-      await git.clone(job.repo, repoDir);
-      emitLog("Repository cloned successfully");
-      repoCloned = true;
+      fs.mkdirSync(path.dirname(repoDir), { recursive: true });
 
-      const dynamicStages = parseJenkinsfile(repoDir);
-      if (dynamicStages && dynamicStages.length > 0) {
-        emitLog("Parsed stages from Jenkinsfile");
-        // Update stages dynamically, broadcasting the full pipeline change
+      emitLog(`Cloning ${job.repo}`);
+      await simpleGit().clone(job.repo, repoDir);
+      emitLog("Clone success");
+
+      const dynamicStages = parseJenkinsfile(repoDir) || [];
+
+      if (dynamicStages.length === 0) {
+        emitLog("No Jenkinsfile → default pipeline used");
+
+        job.stages = [
+          { name: "Fetch Code" },
+          { name: "Install Dependencies" },
+          { name: "Build" },
+          { name: "Docker Build" },
+          { name: "Run Container" }
+        ];
+      } else {
         job.stages = dynamicStages;
-        broadcastJobUpdate(job, 'pipeline_updated');
       }
+
+      broadcastJobUpdate(job, 'pipeline_updated');
 
     } catch (err) {
-      emitLog(`Failed to clone repository: ${err.message}`);
+      emitLog(`Clone error: ${err.message}`);
       job.status = "FAILED";
-      job.completedAt = new Date().toISOString();
-      emitLog("Pipeline finished with status: FAILED");
-      broadcastJobUpdate(job, 'job_failed');
-      return resolve();
-    }
-
-    if (!job.stages || job.stages.length === 0) {
-      job.status = "FAILED";
-      job.completedAt = new Date().toISOString();
-      emitLog("Pipeline failed: No stages defined");
       broadcastJobUpdate(job, 'job_failed');
       return resolve();
     }
 
     let failed = false;
 
-    // Simulate explicit shouldFail setting
-    const jobWillFail = Math.random() < 0.02;
-
-    for (let i = 0; i < job.stages.length; i++) {
-      const stage = job.stages[i];
-
-      job.currentStage = stage.name;
+    for (let stage of job.stages) {
       stage.status = "RUNNING";
-      stage.startTime = new Date().toISOString();
-
       broadcastJobUpdate(job, 'stage_started', stage.name);
-      emitLog(`Stage '${stage.name}' started...`);
+      emitLog(`▶ ${stage.name}`);
 
       try {
-        const stageNameLower = stage.name.toLowerCase();
-        let cmdToRun = null;
+        const name = stage.name.toLowerCase();
 
-        if (stageNameLower.includes("install")) {
-          cmdToRun = "npm install";
-          emitLog("Installing dependencies...");
-        } else if (stageNameLower.includes("test")) {
-          cmdToRun = "npm test";
-          emitLog("Running tests...");
-        } else if (stageNameLower.includes("build")) {
-          cmdToRun = "npm run build";
+        if (name.includes("install")) {
+          await runCommand("npm install", repoDir, emitLog);
         }
 
-        if (cmdToRun) {
-          await runCommand(cmdToRun, repoDir, emitLog);
-          if (stageNameLower.includes("build")) emitLog("Build successful");
-        } else {
-          emitLog(`Running simulated steps for '${stage.name}'`);
-          // Simulate execution delay for stages with no command mapping
+        else if (name.includes("build") && !name.includes("docker")) {
+          await runCommand("npm run build", repoDir, emitLog);
+        }
+
+        else if (name.includes("docker build")) {
+          emitLog("Creating Dockerfile for frontend app...");
+
+          const dockerfile = `
+FROM node:18
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+RUN npm run build
+
+RUN npm install -g serve
+
+EXPOSE 4000
+
+CMD ["serve", "-s", "dist", "-l", "4000"]
+`;
+
+          fs.writeFileSync(path.join(repoDir, 'Dockerfile'), dockerfile);
+
+          await runCommand(
+            "docker build -t deployed-app:latest .",
+            repoDir,
+            emitLog
+          );
+        }
+
+        else if (name.includes("run container")) {
+          await runCommand("docker rm -f deployed-app-container", repoDir, emitLog).catch(() => { });
+
+          await runCommand(
+            "docker run -d --name deployed-app-container -p 2000:4000 deployed-app:latest",
+            repoDir,
+            emitLog
+          );
+        }
+
+        else {
           await new Promise(r => setTimeout(r, STAGE_DELAY_MS));
-          
-          const failOnThisStage =
-            (job.shouldFail && i === Math.floor(job.stages.length / 2)) ||
-            (jobWillFail && i === Math.floor(job.stages.length / 2));
-
-          if (failOnThisStage) {
-            throw new Error(`ERROR: Stage '${stage.name}' failed unexpectedly!`);
-          }
         }
 
-        // Success case
         stage.status = "SUCCESS";
-        stage.endTime = new Date().toISOString();
         broadcastJobUpdate(job, 'stage_completed', stage.name);
-        emitLog(`Stage '${stage.name}' completed successfully.`);
 
       } catch (err) {
         stage.status = "FAILED";
-        stage.endTime = new Date().toISOString();
+        emitLog(`❌ ${err.message}`);
         broadcastJobUpdate(job, 'stage_failed', stage.name);
-        emitLog(`ERROR: ${err.message}`);
         failed = true;
-        break; // Stop pipeline on failure
+        break;
       }
     }
 
-    // Final job status
     job.status = failed ? "FAILED" : "COMPLETED";
     job.completedAt = new Date().toISOString();
-    job.currentStage = null;
 
-    if (failed) {
-      emitLog("Pipeline finished with status: FAILED");
-    } else {
-      emitLog("Pipeline completed");
-    }
+    emitLog(job.status === "COMPLETED" ? "✅ DONE" : "❌ FAILED");
 
     broadcastJobUpdate(job, failed ? 'job_failed' : 'job_completed');
 
-    // Cleanup repository folder asynchronously
-    if (repoCloned) {
-      fs.rm(repoDir, { recursive: true, force: true }, (err) => {
-        if (err) console.error(`Failed to clean up repo dir ${repoDir}:`, err);
-      });
-    }
+    fs.rm(repoDir, { recursive: true, force: true }, () => { });
 
     resolve();
   });

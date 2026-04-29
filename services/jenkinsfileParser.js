@@ -1,22 +1,41 @@
 const fs = require('fs');
 const path = require('path');
 
+/* =========================
+   DEFAULT PIPELINE
+========================= */
+
+const DEFAULT_STAGES = [
+  "Fetch Code",
+  "Install Dependencies",
+  "Build",
+  "Test",
+  "Security Scan",
+  "Docker Build",
+  "Run Container"
+];
+
+/* =========================
+   OPTIONAL STATIC CONFIG
+========================= */
+
 const REPO_CONFIG = {
   "repo1": {
-    "main": ["Fetch Code", "Install Dependencies", "Build", "Test", "Security Scan", "Docker Build", "Push to Registry"],
-    "dev": ["Fetch Code", "Install Dependencies", "Build", "Test", "Security Scan"]
+    "main": DEFAULT_STAGES,
+    "dev": [
+      "Fetch Code",
+      "Install Dependencies",
+      "Build",
+      "Test"
+    ]
   }
 };
 
-const DEFAULT_STAGES = ["Fetch Code", "Install Dependencies", "Build", "Test", "Security Scan", "Docker Build", "Push to Registry"];
+/* =========================
+   STAGE FORMATTER
+========================= */
 
-function parseStages(repo, branch) {
-  let stageNames = DEFAULT_STAGES;
-  
-  if (REPO_CONFIG[repo] && REPO_CONFIG[repo][branch]) {
-    stageNames = REPO_CONFIG[repo][branch];
-  }
-  
+function formatStages(stageNames) {
   return stageNames.map(name => ({
     name,
     status: "PENDING",
@@ -25,32 +44,56 @@ function parseStages(repo, branch) {
   }));
 }
 
+/* =========================
+   STATIC CONFIG PARSER
+========================= */
+
+function parseStages(repo, branch) {
+  if (REPO_CONFIG[repo] && REPO_CONFIG[repo][branch]) {
+    return formatStages(REPO_CONFIG[repo][branch]);
+  }
+
+  return formatStages(DEFAULT_STAGES);
+}
+
+/* =========================
+   JENKINSFILE PARSER
+========================= */
+
 function parseJenkinsfile(repoDir) {
   try {
-    const jenkinsfilePath = path.join(repoDir, 'Jenkinsfile');
-    if (fs.existsSync(jenkinsfilePath)) {
-      const content = fs.readFileSync(jenkinsfilePath, 'utf8');
-      const stageRegex = /stage\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
-      
-      let match;
-      const stageNames = [];
-      while ((match = stageRegex.exec(content)) !== null) {
-        stageNames.push(match[1]);
-      }
-      
-      if (stageNames.length > 0) {
-        return stageNames.map(name => ({
-          name,
-          status: "PENDING",
-          startTime: null,
-          endTime: null
-        }));
-      }
+    const filePath = path.join(repoDir, 'Jenkinsfile');
+
+    if (!fs.existsSync(filePath)) {
+      return formatStages(DEFAULT_STAGES);
     }
+
+    const content = fs.readFileSync(filePath, 'utf8');
+
+    const stageRegex = /stage\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+
+    let match;
+    const stages = [];
+
+    while ((match = stageRegex.exec(content)) !== null) {
+      stages.push(match[1]);
+    }
+
+    // ✅ If Jenkinsfile has stages → use them
+    if (stages.length > 0) {
+      return formatStages(stages);
+    }
+
+    // ❗ If Jenkinsfile exists but no valid stages
+    console.log("⚠️ Jenkinsfile found but no valid stages → using default");
+
+    return formatStages(DEFAULT_STAGES);
+
   } catch (err) {
-    console.error("Error parsing Jenkinsfile:", err);
+    console.error("❌ Jenkinsfile parse error:", err.message);
+
+    return formatStages(DEFAULT_STAGES);
   }
-  return null;
 }
 
 module.exports = { parseStages, parseJenkinsfile };
