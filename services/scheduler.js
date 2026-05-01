@@ -1,53 +1,57 @@
-const { getNextJob, hasJobs, addJob } = require('./queue');
-const { getAvailableWorker, assignWorker } = require('./workerManager');
+const { Worker } = require('bullmq');
+const { connection } = require('../queue/redisQueue');
 const { runJob } = require('./jobRunner');
 
-let isRunning = false;
+let workerInstance = null;
 
 function startScheduler() {
-  setInterval(async () => {
-
-    // 🔒 Prevent overlapping scheduler loops
-    if (isRunning) return;
-    isRunning = true;
-
+  workerInstance = new Worker('nova-ci-jobs', async (jobEvent) => {
+    const jobData = jobEvent.data;
+    console.log(`[Scheduler] Picked up job ${jobData.id} from Redis`);
+    
     try {
-      if (!hasJobs()) return;
-
-      const job = getNextJob();
-
-      if (!job) return;
-
-      const worker = getAvailableWorker(job);
-
-      // ❗ FIX: put job back if no worker
-      if (!worker) {
-        console.log("[Scheduler] No free worker → re-queueing job");
-
-        addJob(job); // ✅ important fix
-        return;
-      }
-
-      console.log(`[Scheduler] Assigning ${job.id} → ${worker.id}`);
-
-      assignWorker(worker, job);
-
-      // 🚀 Run async (parallel)
-      runJob(job)
-        .catch(err => {
-          console.error(`[Scheduler] Job failed: ${err.message}`);
-        })
-        .finally(() => {
-          console.log(`[Scheduler] Worker ${worker.id} freed`);
-        });
-
+      await runJob(jobData);
     } catch (err) {
-      console.error("[Scheduler ERROR]:", err.message);
-    } finally {
-      isRunning = false;
+      console.error(`[Scheduler] Job execution failed: ${err.message}`);
+      throw err;
     }
+  }, { 
+    connection,
+    concurrency: 4 // Allow 4 concurrent jobs per server instance
+  });
 
-  }, 2000);
+  workerInstance.on('completed', (job) => {
+    console.log(`[Scheduler] Job ${job.id} has completed!`);
+  });
+
+  workerInstance.on('failed', (job, err) => {
+    console.error(`[Scheduler] Job ${job.id} has failed with ${err.message}`);
+  });
+
+  console.log("🧠 Redis-backed Scheduler started");
 }
 
-module.exports = { startScheduler };
+function startCleanupJob() {
+  const { exec } = require('child_process');
+  // Run cleanup every hour
+  setInterval(() => {
+    console.log("[Cleanup] Running container cleanup...");
+    // Force remove containers matching nova-job- that exited or are orphaned
+    exec(`docker ps -a --filter "name=nova-job-" --filter "status=exited" --format "{{.ID}}"`, (err, stdout) => {
+      if (err) return console.error("[Cleanup] Failed to list containers:", err.message);
+      
+      const containers = stdout.trim().split('\n').filter(Boolean);
+      if (containers.length > 0) {
+        exec(`docker rm -f ${containers.join(' ')}`, (rmErr) => {
+          if (rmErr) console.error("[Cleanup] Failed to clean containers:", rmErr.message);
+        });
+      }
+    });
+    // Remove dangling images
+    exec(`docker image prune -f`, (err) => {
+      if (err) console.error("[Cleanup] Failed to prune images:", err.message);
+    });
+  }, 3600000); // 1 hour
+}
+
+module.exports = { startScheduler, startCleanupJob };

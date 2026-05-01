@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String    @id @default(uuid())
+  email    String    @unique
+  password String
+  projects Project[]
+}
+
+model Project {
+  id            String   @id @default(uuid())
+  name          String
+  repoUrl       String   @unique
+  defaultBranch String   @default("main")
+  createdAt     DateTime @default(now())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+  jobs          Job[]
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  repo        String
+  branch      String
+  commit      String
+  status      String   @default("QUEUED")
+  createdAt   DateTime @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  duration      Int?     // duration in milliseconds
+  failureReason String?
+  source        String
+  pipelineId  String?
+  pipeline    Pipeline? @relation(fields: [pipelineId], references: [id])
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id])
+  stages      Stage[]
+  logs        ExecutionLog[]
+}
+
+model Pipeline {
+  id     String @id @default(uuid())
+  name   String @unique
+  config String // JSON payload for config
+  jobs   Job[]
+}
+
+model Stage {
+  id        String   @id @default(uuid())
+  jobId     String
+  name      String
+  status    String   @default("PENDING")
+  duration  Int?
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model ExecutionLog {
+  id        String   @id @default(uuid())
+  jobId     String
+  message   String
+  timestamp DateTime @default(now())
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
