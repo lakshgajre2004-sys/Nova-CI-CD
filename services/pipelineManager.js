@@ -1,202 +1,235 @@
 const { broadcastJobUpdate, getIO } = require('../websocket/socket');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
 const simpleGit = require('simple-git');
-const { parseJenkinsfile } = require('./jenkinsfileParser');
-const { workers } = require('./workerManager');
+const { runCommand } = require('../executors/dockerRunner');
+const { getPipelineConfig } = require('../pipelines/index');
+const prisma = require('../db/index');
 
-function runCommand(cmd, args, cwd, emitLog) {
-  return new Promise((resolve, reject) => {
-    const process = spawn(cmd, args, { cwd, shell: true });
+/* =========================
+   OPTIONAL: GIT LOG FILE PUSH
+========================= */
+async function appendToNovaFile(job, repoDir, emitLog) {
+  try {
+    const git = simpleGit(repoDir);
+    const filePath = path.join(repoDir, "Nova.txt");
 
-    process.stdout.on("data", data => {
-      const output = data.toString().trim();
-      if (output) emitLog(`[log] ${output}`);
-    });
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf8");
+      if (content.length > 10000) {
+        fs.writeFileSync(filePath, "---- RESET LOG ----\n");
+      }
+    }
 
-    process.stderr.on("data", data => {
-      const output = data.toString().trim();
-      if (output) emitLog(`[log] ${output}`);
-    });
+    const entry = `
+----------------------------------------
+Job ID: ${job.id}
+Status: ${job.status}
+Started: ${job.startedAt}
+Completed: ${job.completedAt}
+----------------------------------------
+`;
 
-    process.on("close", code => {
-      if (code === 0) resolve();
-      else reject(new Error(`${cmd} failed with code ${code}`));
-    });
-  });
+    fs.appendFileSync(filePath, entry);
+
+    await git.addConfig("user.email", "ci@nova.com");
+    await git.addConfig("user.name", "Nova CI");
+
+    await git.add("Nova.txt");
+    await git.commit(`Nova Update: ${job.id}`);
+
+  } catch (err) {
+    emitLog("Nova.txt update failed: " + err.message);
+  }
 }
 
-function extractRepoName(repoUrl) {
-  if (!repoUrl) return "app";
-  const parts = repoUrl.split('/');
-  let lastPart = parts[parts.length - 1];
-  if (lastPart.endsWith('.git')) lastPart = lastPart.slice(0, -4);
-  return lastPart.toLowerCase();
-}
-
+/* =========================
+   PIPELINE EXECUTION
+========================= */
 async function executePipeline(job) {
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve, reject) => {
 
-    const emitLog = (msg) => {
-      const logStr = `[Job ${job.id.split('-')[0]}] ${msg}`;
-      if (!job.logs) job.logs = [];
-      job.logs.push(logStr);
+    const emitLog = async (msg) => {
+      const log = `[Job ${job.id.slice(0, 6)}] ${msg}`;
 
       try {
-        const io = getIO();
-        io.to(job.id).emit("job_log", { jobId: job.id, log: logStr });
+        await prisma.executionLog.create({
+          data: { jobId: job.id, message: log }
+        });
       } catch { }
-    };
 
-    const worker = workers.find(w => w.id === job.workerId);
+      try {
+        getIO().to(job.id).emit("job_log", { jobId: job.id, log });
+      } catch { }
+
+      console.log(log);
+    };
 
     job.status = "IN_PROGRESS";
     job.startedAt = new Date().toISOString();
-    broadcastJobUpdate(job, 'job_started');
 
-    emitLog(`[log] Pipeline started on ${worker?.id}`);
+    await prisma.job.update({
+      where: { id: job.id },
+      data: { status: job.status, startedAt: new Date(job.startedAt) }
+    });
+
+    broadcastJobUpdate(job, 'job_started');
 
     const repoDir = path.join(__dirname, '..', 'repos', job.id);
 
-    // ================= CLONE =================
+    /* ================= CLONE ================= */
     try {
-      fs.mkdirSync(path.join(__dirname, '..', 'repos'), { recursive: true });
+      fs.mkdirSync(path.dirname(repoDir), { recursive: true });
 
-      emitLog("[stage_started]");
-      emitLog("[log] Cloning repository...");
-      await simpleGit().clone(job.repo, repoDir);
-      emitLog("[log] Repository cloned");
-      emitLog("[stage_completed]");
+      await emitLog(`Cloning ${job.repo}`);
 
-      const dynamicStages = parseJenkinsfile(repoDir);
-      if (dynamicStages?.length) {
-        job.stages = dynamicStages;
-        broadcastJobUpdate(job, 'pipeline_updated');
+      const git = simpleGit();
+      await git.clone(job.repo, repoDir);
+
+      const repoGit = simpleGit(repoDir);
+
+      if (job.branch) {
+        await repoGit.checkout(job.branch);
+      }
+
+      if (job.commit && job.commit !== "HEAD") {
+        await repoGit.checkout(job.commit);
       }
 
     } catch (err) {
-      emitLog("[stage_failed]");
-      emitLog(`[log] Clone failed: ${err.message}`);
+      await emitLog(`Clone failed: ${err.message}`);
       job.status = "FAILED";
+
+      await prisma.job.update({
+        where: { id: job.id },
+        data: { status: job.status, failureReason: err.message }
+      });
+
       broadcastJobUpdate(job, 'job_failed');
       return resolve();
     }
 
-    const repoName = extractRepoName(job.repo);
-    const dockerUser = "laksh04"; // your docker username
+    /* ================= LOAD PIPELINE ================= */
+    const stages = getPipelineConfig(repoDir);
 
+    if (!stages || stages.length === 0) {
+      await emitLog("No pipeline config found");
+      job.status = "FAILED";
+
+      await prisma.job.update({
+        where: { id: job.id },
+        data: { status: job.status, failureReason: "No pipeline config" }
+      });
+
+      return resolve();
+    }
+
+    job.stages = stages;
+
+    for (const stage of stages) {
+      await prisma.stage.create({
+        data: {
+          jobId: job.id,
+          name: stage.name,
+          status: "PENDING"
+        }
+      });
+    }
+
+    broadcastJobUpdate(job, 'pipeline_updated');
+
+    /* ================= EXECUTION ================= */
     let failed = false;
 
-    // ================= PIPELINE =================
-    for (let stage of job.stages) {
+    const dbStages = await prisma.stage.findMany({
+      where: { jobId: job.id }
+    });
 
-      job.currentStage = stage.name;
-      stage.status = "RUNNING";
-      stage.startTime = new Date().toISOString();
+    for (let stage of stages) {
+      const dbStage = dbStages.find(s => s.name === stage.name);
+
+      const start = Date.now();
+
+      if (dbStage) {
+        await prisma.stage.update({
+          where: { id: dbStage.id },
+          data: { status: "RUNNING" }
+        });
+      }
 
       broadcastJobUpdate(job, 'stage_started', stage.name);
-      emitLog("[stage_started]");
-      emitLog(`[log] Stage '${stage.name}' started`);
-
-      const name = stage.name.toLowerCase();
+      await emitLog(`▶ ${stage.name}`);
 
       try {
-
-        // INSTALL
-        if (name.includes("install")) {
-          await runCommand("npm", ["install"], repoDir, emitLog);
+        if (stage.commands) {
+          for (const cmd of stage.commands) {
+            await runCommand(cmd, repoDir, emitLog);
+          }
+        } else {
+          // fallback behavior
+          if (stage.name.toLowerCase().includes("install")) {
+            await runCommand("npm install", repoDir, emitLog);
+          } else if (stage.name.toLowerCase().includes("test")) {
+            await runCommand("npm test", repoDir, emitLog);
+          } else if (stage.name.toLowerCase().includes("build")) {
+            await runCommand("npm run build", repoDir, emitLog);
+          }
         }
 
-        // BUILD
-        else if (name === "build") {
-          await runCommand("npm", ["run", "build"], repoDir, emitLog);
+        const duration = Date.now() - start;
+
+        if (dbStage) {
+          await prisma.stage.update({
+            where: { id: dbStage.id },
+            data: { status: "SUCCESS", duration }
+          });
         }
 
-        // TEST
-        else if (name.includes("test")) {
-          await runCommand("npm", ["test"], repoDir, emitLog);
-        }
-
-        // SECURITY
-        else if (name.includes("security")) {
-          emitLog("[log] Running basic security scan...");
-        }
-
-        // 🔥 DOCKER BUILD
-        else if (name.includes("docker build")) {
-
-          emitLog("[log] Checking Docker engine...");
-          await runCommand("docker", ["info"], repoDir, emitLog);
-
-          emitLog(`[log] Building Docker image: ${repoName}`);
-          await runCommand("docker", ["build", "-t", repoName, "."], repoDir, emitLog);
-        }
-
-        // 🔥 RUN CONTAINER (NEW)
-        else if (name.includes("run")) {
-
-          const containerName = `${repoName}-container`;
-
-          emitLog("[log] Removing old container if exists...");
-          await runCommand("docker", ["rm", "-f", containerName], repoDir, emitLog).catch(() => { });
-
-          emitLog(`[log] Running container: ${containerName}`);
-
-          await runCommand("docker", [
-            "run",
-            "-d",
-            "--name", containerName,
-            "-p", "4000:4000", // change if needed
-            repoName
-          ], repoDir, emitLog);
-
-          emitLog("[log] Container started successfully");
-        }
-
-        // 🔥 PUSH
-        else if (name.includes("push")) {
-
-          const fullImage = `${dockerUser}/${repoName}`;
-
-          emitLog(`[log] Tagging image: ${fullImage}`);
-          await runCommand("docker", ["tag", repoName, fullImage], repoDir, emitLog);
-
-          emitLog("[log] Pushing to Docker Hub...");
-          await runCommand("docker", ["push", fullImage], repoDir, emitLog);
-        }
-
-        stage.status = "SUCCESS";
-        stage.endTime = new Date().toISOString();
         broadcastJobUpdate(job, 'stage_completed', stage.name);
 
-        emitLog(`[log] Stage '${stage.name}' completed`);
-        emitLog("[stage_completed]");
-
       } catch (err) {
-        stage.status = "FAILED";
-        stage.endTime = new Date().toISOString();
+        failed = true;
+
+        const duration = Date.now() - start;
+
+        if (dbStage) {
+          await prisma.stage.update({
+            where: { id: dbStage.id },
+            data: { status: "FAILED", duration }
+          });
+        }
+
+        await emitLog(`❌ ${err.message}`);
         broadcastJobUpdate(job, 'stage_failed', stage.name);
 
-        emitLog("[stage_failed]");
-        emitLog(`[log] ERROR: ${err.message}`);
-
-        failed = true;
         break;
       }
     }
 
-    // ================= FINAL =================
+    /* ================= FINAL ================= */
     job.status = failed ? "FAILED" : "COMPLETED";
     job.completedAt = new Date().toISOString();
-    job.currentStage = null;
 
-    emitLog(`[log] Pipeline finished: ${job.status}`);
+    await prisma.job.update({
+      where: { id: job.id },
+      data: {
+        status: job.status,
+        completedAt: new Date(job.completedAt)
+      }
+    });
+
+    if (!failed) {
+      await appendToNovaFile(job, repoDir, emitLog);
+    }
+
+    await emitLog(job.status === "COMPLETED" ? "✅ DONE" : "❌ FAILED");
+
     broadcastJobUpdate(job, failed ? 'job_failed' : 'job_completed');
 
     fs.rm(repoDir, { recursive: true, force: true }, () => { });
 
-    resolve();
+    if (failed) reject(new Error("Pipeline failed"));
+    else resolve();
   });
 }
 

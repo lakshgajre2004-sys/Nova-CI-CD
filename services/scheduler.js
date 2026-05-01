@@ -1,61 +1,58 @@
-const store = require('../models/JobStore');
-const { executePipeline } = require('./pipelineManager');
+const { Worker } = require('bullmq');
+const { connection } = require('../queue/redisQueue');
+const { runJob } = require('./jobRunner');
 
-const workerManager = require('./workerManager');
+let workerInstance = null;
 
-function schedule() {
-  // C. Optional Load Behavior: Simulated system load if queue is long
-  const loadDelay = store.queue.length > 5 ? 500 : 0;
-  
-  if (loadDelay > 0) {
-    setTimeout(runSchedule, loadDelay);
-  } else {
-    runSchedule();
-  }
+function startScheduler() {
+  workerInstance = new Worker('nova-ci-jobs', async (jobEvent) => {
+    const jobData = jobEvent.data;
+    console.log(`[Scheduler] Picked up job ${jobData.id} from Redis`);
+
+
+    try {
+      await runJob(jobData);
+    } catch (err) {
+      console.error(`[Scheduler] Job execution failed: ${err.message}`);
+      throw err;
+    }
+  }, {
+    connection,
+    concurrency: 4 // Allow 4 concurrent jobs per server instance
+  });
+
+  workerInstance.on('completed', (job) => {
+    console.log(`[Scheduler] Job ${job.id} has completed!`);
+  });
+
+  workerInstance.on('failed', (job, err) => {
+    console.error(`[Scheduler] Job ${job.id} has failed with ${err.message}`);
+  });
+
+  console.log("🧠 Redis-backed Scheduler started");
 }
 
-function runSchedule() {
-  const jobId = store.dequeue();
-  if (!jobId) return; // Queue is empty
+function startCleanupJob() {
+  const { exec } = require('child_process');
+  // Run cleanup every hour
+  setInterval(() => {
+    console.log("[Cleanup] Running container cleanup...");
+    // Force remove containers matching nova-job- that exited or are orphaned
+    exec(`docker ps -a --filter "name=nova-job-" --filter "status=exited" --format "{{.ID}}"`, (err, stdout) => {
+      if (err) return console.error("[Cleanup] Failed to list containers:", err.message);
 
-  const job = store.getJob(jobId);
-  if (!job || job.status !== 'QUEUED') {
-    return schedule(); // Drop invalid jobs and retry
-  }
-
-  const worker = workerManager.getAvailableWorker(job);
-  if (worker) {
-    // Reserve worker immediately
-    workerManager.assignWorker(worker, job);
-    console.log(`[Scheduler] Job ${job.id} assigned to ${worker.id}`);
-    console.log(`[Scheduler] Job moved to execution`);
-    
-    // B. Worker Assignment Delay
-    const assignmentDelay = Math.random() * 1000;
-    setTimeout(() => {
-      console.log(`[Worker] ${worker.id} started job ${job.id}`);
-      executePipeline(job)
-        .then(() => {
-          console.log(`[Worker] ${worker.id} completed job ${job.id}`);
-          workerManager.releaseWorker(worker);
-          schedule();
-        })
-        .catch((err) => {
-          console.error('Job pipeline error:', err);
-          console.log(`[Worker] ${worker.id} completed job ${job.id}`);
-          workerManager.releaseWorker(worker);
-          schedule();
+      const containers = stdout.trim().split('\n').filter(Boolean);
+      if (containers.length > 0) {
+        exec(`docker rm -f ${containers.join(' ')}`, (rmErr) => {
+          if (rmErr) console.error("[Cleanup] Failed to clean containers:", rmErr.message);
         });
-    }, assignmentDelay);
-
-    // Attempt to fill remaining concurrency slots
-    schedule();
-  } else {
-    // If no matching worker is available -> keep job in queue
-    store.enqueue(jobId);
-    // Retry later
-    setTimeout(schedule, 2000);
-  }
+      }
+    });
+    // Remove dangling images
+    exec(`docker image prune -f`, (err) => {
+      if (err) console.error("[Cleanup] Failed to prune images:", err.message);
+    });
+  }, 3600000); // 1 hour
 }
 
-module.exports = { schedule };
+module.exports = { startScheduler, startCleanupJob };
