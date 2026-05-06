@@ -18,20 +18,16 @@ async function appendToNovaFile(job, repoDir, emitLog) {
 
     await emitLog('📝 Updating NOVA.txt');
 
-    // Prevent oversized log file
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf8');
-
-      if (content.length > 10000) {
-        fs.writeFileSync(filePath, '---- RESET LOG ----\n');
-      }
+    // Ensure file exists
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, '');
     }
 
     const entry = `
 ========================================
 Job ID: ${job.id}
-Repository: ${job.repo || 'unknown'}
-Branch: ${job.branch || 'unknown'}
+Repository: ${job.repo}
+Branch: ${job.branch}
 Status: ${job.status}
 Started: ${job.startedAt}
 Completed: ${job.completedAt}
@@ -39,22 +35,24 @@ Completed: ${job.completedAt}
 
 `;
 
-    // Append log entry
-    fs.appendFileSync(filePath, entry);
+    fs.appendFileSync(filePath, entry, 'utf8');
 
     await emitLog('📦 Staging NOVA.txt');
 
-    await git.addConfig(
-      'user.email',
-      'ci@nova.com'
-    );
+    await git.addConfig('user.email', 'ci@nova.com');
+    await git.addConfig('user.name', 'Nova CI');
 
-    await git.addConfig(
-      'user.name',
-      'Nova CI'
-    );
+    // FORCE stage exact file
+    await git.add('./NOVA.txt');
 
-    await git.add('NOVA.txt');
+    // Verify git actually sees changes
+    const staged = await git.diff(['--cached']);
+
+    console.log('STAGED DIFF:', staged);
+
+    if (!staged || staged.trim().length === 0) {
+      throw new Error('NOVA.txt was not staged properly');
+    }
 
     await emitLog('📝 Creating commit');
 
@@ -62,10 +60,7 @@ Completed: ${job.completedAt}
       'Nova CI Update [skip ci]'
     );
 
-    console.log(
-      '✅ COMMIT RESULT:',
-      commitResult
-    );
+    console.log('COMMIT RESULT:', commitResult);
 
     await emitLog(
       '⬆️ Pushing NOVA.txt to GitHub'
