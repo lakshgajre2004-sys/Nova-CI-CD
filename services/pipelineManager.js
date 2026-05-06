@@ -84,6 +84,11 @@ async function executePipeline(job) {
       await emitLog(`Cloning ${job.repo}`);
 
       const git = simpleGit();
+      // Clean before cloning
+      if (fs.existsSync(repoDir)) {
+        fs.rmSync(repoDir, { recursive: true, force: true });
+      }
+
       await git.clone(job.repo, repoDir);
 
       const repoGit = simpleGit(repoDir);
