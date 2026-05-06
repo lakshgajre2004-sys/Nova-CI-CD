@@ -12,7 +12,12 @@ const prisma = require('../db/index');
 async function appendToNovaFile(job, repoDir, emitLog) {
   try {
     const git = simpleGit(repoDir);
-    const filePath = path.join(repoDir, "Nova.txt");
+
+    // Clean repository before NOVA.txt update
+    await git.reset(['--hard']);
+    await git.clean('f', ['-d']);
+
+    const filePath = path.join(repoDir, "NOVA.txt");
 
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, "utf8");
@@ -22,24 +27,43 @@ async function appendToNovaFile(job, repoDir, emitLog) {
     }
 
     const entry = `
-----------------------------------------
+========================================
 Job ID: ${job.id}
+Repository: ${job.repo || 'unknown'}
+Branch: ${job.branch || 'unknown'}
 Status: ${job.status}
 Started: ${job.startedAt}
 Completed: ${job.completedAt}
-----------------------------------------
+========================================
 `;
 
     fs.appendFileSync(filePath, entry);
 
+    const statusOutput = await git.raw(['status', '--porcelain']);
+    if (statusOutput) {
+      const lines = statusOutput.split('\n').filter(l => l.trim().length > 0);
+      const nonNovaFiles = lines.filter(line => {
+        const file = line.substring(3).trim();
+        return file !== 'NOVA.txt';
+      });
+
+      if (nonNovaFiles.length > 0) {
+        await emitLog("Blocked unsafe auto-commit: non-NOVA files modified");
+        return;
+      }
+    }
+
     await git.addConfig("user.email", "ci@nova.com");
     await git.addConfig("user.name", "Nova CI");
 
-    await git.add("Nova.txt");
-    await git.commit(`Nova Update: ${job.id}`);
+    await git.add("NOVA.txt");
+
+    await git.commit("Nova CI Update [skip ci]");
+
+    await git.push("origin", job.branch || "main");
 
   } catch (err) {
-    emitLog("Nova.txt update failed: " + err.message);
+    await emitLog("NOVA.txt update failed: " + err.message);
   }
 }
 
@@ -84,12 +108,18 @@ async function executePipeline(job) {
       await emitLog(`Cloning ${job.repo}`);
 
       const git = simpleGit();
+
       // Clean before cloning
       if (fs.existsSync(repoDir)) {
         fs.rmSync(repoDir, { recursive: true, force: true });
       }
 
-      await git.clone(job.repo, repoDir);
+      const authenticatedRepo = job.repo.replace(
+        "https://",
+        `https://${process.env.GITHUB_TOKEN}@`
+      );
+
+      await git.clone(authenticatedRepo, repoDir);
 
       const repoGit = simpleGit(repoDir);
 

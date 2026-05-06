@@ -70,6 +70,13 @@ app.get('/', (req, res) => {
 
 app.post('/webhook/github', async (req, res) => {
   try {
+
+    // Prevent infinite CI loop
+    if (req.body.head_commit?.message?.includes('[skip ci]')) {
+      console.log('⏭ Skipping CI-generated commit');
+      return res.sendStatus(200);
+    }
+
     logger.info("📩 Webhook received");
 
     const secret = process.env.GITHUB_WEBHOOK_SECRET;
@@ -85,7 +92,12 @@ app.post('/webhook/github', async (req, res) => {
       const hmac = crypto.createHmac('sha256', secret);
       const digest = 'sha256=' + hmac.update(req.rawBody).digest('hex');
 
-      if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest))) {
+      if (
+        !crypto.timingSafeEqual(
+          Buffer.from(signature),
+          Buffer.from(digest)
+        )
+      ) {
         logger.error("❌ Invalid webhook signature");
         return res.status(401).send("Invalid signature");
       }
@@ -96,8 +108,11 @@ app.post('/webhook/github', async (req, res) => {
       req.body?.repository?.git_url ||
       req.body?.repo;
 
-    const branch = req.body?.ref?.replace('refs/heads/', '') || "main";
-    const commit = req.body?.head_commit?.id || "HEAD";
+    const branch =
+      req.body?.ref?.replace('refs/heads/', '') || 'main';
+
+    const commit =
+      req.body?.head_commit?.id || 'HEAD';
 
     if (!repo) {
       console.log("❌ Invalid webhook payload:", req.body);
@@ -116,7 +131,7 @@ app.post('/webhook/github', async (req, res) => {
         data: {
           name: repo.split('/').pop().replace('.git', ''),
           repoUrl: repo,
-          defaultBranch: 'main'
+          defaultBranch: branch
         }
       });
     }
