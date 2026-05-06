@@ -14,10 +14,6 @@ async function appendToNovaFile(job, repoDir, emitLog) {
 
     const git = simpleGit(repoDir);
 
-    // Clean repository before NOVA.txt update
-    await git.reset(['--hard']);
-    await git.clean('f', ['-d']);
-
     const filePath = path.join(repoDir, 'NOVA.txt');
 
     await emitLog('📝 Updating NOVA.txt');
@@ -43,6 +39,7 @@ Completed: ${job.completedAt}
 
 `;
 
+    // Append log entry
     fs.appendFileSync(filePath, entry);
 
     // Verify ONLY NOVA.txt changed
@@ -60,11 +57,15 @@ Completed: ${job.completedAt}
       });
 
       if (nonNovaFiles.length > 0) {
+
         await emitLog(
           'Blocked unsafe auto-commit: non-NOVA files modified'
         );
 
-        console.log('❌ Unsafe files:', nonNovaFiles);
+        console.log(
+          '❌ Unsafe files:',
+          nonNovaFiles
+        );
 
         return;
       }
@@ -72,29 +73,53 @@ Completed: ${job.completedAt}
 
     await emitLog('📦 Staging NOVA.txt');
 
-    await git.addConfig('user.email', 'ci@nova.com');
-    await git.addConfig('user.name', 'Nova CI');
+    await git.addConfig(
+      'user.email',
+      'ci@nova.com'
+    );
+
+    await git.addConfig(
+      'user.name',
+      'Nova CI'
+    );
 
     await git.add('NOVA.txt');
 
     await emitLog('📝 Creating commit');
 
-    await git.commit('Nova CI Update [skip ci]');
+    const commitResult = await git.commit(
+      'Nova CI Update [skip ci]'
+    );
 
-    await emitLog('⬆️ Pushing NOVA.txt to GitHub');
+    console.log(
+      '✅ COMMIT RESULT:',
+      commitResult
+    );
+
+    await emitLog(
+      '⬆️ Pushing NOVA.txt to GitHub'
+    );
 
     const pushResult = await git.push(
       'origin',
       job.branch || 'main'
     );
 
-    console.log('✅ PUSH RESULT:', pushResult);
+    console.log(
+      '✅ PUSH RESULT:',
+      pushResult
+    );
 
-    await emitLog('✅ NOVA.txt pushed successfully');
+    await emitLog(
+      '✅ NOVA.txt pushed successfully'
+    );
 
   } catch (err) {
 
-    console.error('❌ NOVA PUSH ERROR:', err);
+    console.error(
+      '❌ NOVA PUSH ERROR:',
+      err
+    );
 
     await emitLog(
       `❌ NOVA push failed: ${err.message}`
