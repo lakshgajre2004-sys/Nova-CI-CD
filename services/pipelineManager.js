@@ -42,10 +42,10 @@ Completed: ${job.completedAt}
     await git.addConfig('user.email', 'ci@nova.com');
     await git.addConfig('user.name', 'Nova CI');
 
-    // FORCE stage exact file
+    // Force stage exact file
     await git.add('./NOVA.txt');
 
-    // Verify git actually sees changes
+    // Verify staged changes exist
     const staged = await git.diff(['--cached']);
 
     console.log('STAGED DIFF:', staged);
@@ -62,30 +62,22 @@ Completed: ${job.completedAt}
 
     console.log('COMMIT RESULT:', commitResult);
 
-    await emitLog(
-      '⬆️ Pushing NOVA.txt to GitHub'
-    );
+    await emitLog('⬆️ Pushing NOVA.txt to GitHub');
+
+    const branchName = job.branch || 'main';
 
     const pushResult = await git.push(
       'origin',
-      job.branch || 'main'
+      `HEAD:${branchName}`
     );
 
-    console.log(
-      '✅ PUSH RESULT:',
-      pushResult
-    );
+    console.log('✅ PUSH RESULT:', pushResult);
 
-    await emitLog(
-      '✅ NOVA.txt pushed successfully'
-    );
+    await emitLog('✅ NOVA.txt pushed successfully');
 
   } catch (err) {
 
-    console.error(
-      '❌ NOVA PUSH ERROR:',
-      err
-    );
+    console.error('❌ NOVA PUSH ERROR:', err);
 
     await emitLog(
       `❌ NOVA push failed: ${err.message}`
@@ -160,7 +152,7 @@ async function executePipeline(job) {
 
       const git = simpleGit();
 
-      // Clean old repo if exists
+      // Clean old repo
       if (fs.existsSync(repoDir)) {
         fs.rmSync(repoDir, {
           recursive: true,
@@ -173,22 +165,31 @@ async function executePipeline(job) {
         `https://${process.env.GITHUB_TOKEN}@`
       );
 
-      await emitLog('🔐 Using authenticated GitHub clone');
+      await emitLog(
+        '🔐 Using authenticated GitHub clone'
+      );
 
       await git.clone(authenticatedRepo, repoDir);
 
       const repoGit = simpleGit(repoDir);
 
-      if (job.branch) {
-        await repoGit.checkout(job.branch);
-      }
+      const branchName = job.branch || 'main';
 
-      if (
-        job.commit &&
-        job.commit !== 'HEAD'
-      ) {
-        await repoGit.checkout(job.commit);
-      }
+      // Ensure proper tracking branch
+      await repoGit.fetch(
+        'origin',
+        branchName
+      );
+
+      await repoGit.checkout([
+        '-B',
+        branchName,
+        `origin/${branchName}`
+      ]);
+
+      console.log(
+        `✅ Checked out tracking branch ${branchName}`
+      );
 
     } catch (err) {
 
@@ -303,6 +304,7 @@ async function executePipeline(job) {
               .toLowerCase()
               .includes('install')
           ) {
+
             await runCommand(
               'npm install',
               repoDir,
@@ -314,6 +316,7 @@ async function executePipeline(job) {
               .toLowerCase()
               .includes('test')
           ) {
+
             await runCommand(
               'npm test',
               repoDir,
@@ -325,6 +328,7 @@ async function executePipeline(job) {
               .toLowerCase()
               .includes('build')
           ) {
+
             await runCommand(
               'npm run build',
               repoDir,
@@ -424,7 +428,7 @@ async function executePipeline(job) {
         : 'job_completed'
     );
 
-    // Cleanup cloned repo
+    // Cleanup repo
     fs.rm(
       repoDir,
       {
