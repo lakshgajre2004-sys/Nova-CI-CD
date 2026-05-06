@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-nova-dark: #0b0c10;
+  --color-nova-card: #1f2833;
+  --color-nova-border: #2a313c;
+  --color-nova-accent: #66fcf1;
+  --color-nova-secondary: #45a29e;
+  --color-nova-text: #c5c6c7;
+  --color-nova-success: #10b981;
+  --color-nova-fail: #ef4444;
+  --color-nova-warn: #f59e0b;
+  --color-nova-run: #3b82f6;
+  
+  --font-mono: 'Fira Code', 'Roboto Mono', monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--color-nova-dark);
+  color: var(--color-nova-text);
+  font-family: var(--font-sans);
+}
+
+.glass-panel {
+  background: rgba(31, 40, 51, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(102, 252, 241, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.glow-text-accent {
+  text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+}
+
+.glow-border-success {
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.glow-border-fail {
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.glow-border-run {
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0c10;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a313c;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #45a29e;
+}

@@ -27,17 +27,23 @@ const server = http.createServer(app);
 const PORT = 4000;
 
 /* =========================
-   BULL BOARD
+   NOVA RUNTIME ADMIN
 ========================= */
 const serverAdapter = new ExpressAdapter();
-serverAdapter.setBasePath('/admin/queues');
+serverAdapter.setBasePath('/runtime');
 
 createBullBoard({
   queues: [new BullMQAdapter(jobQueue)],
   serverAdapter,
+  options: {
+    uiConfig: {
+      boardTitle: 'NOVA CI',
+      miscLinks: [{ text: 'Nova Pipeline Engine', url: '/' }]
+    }
+  }
 });
 
-app.use('/admin/queues', serverAdapter.getRouter());
+app.use('/runtime', serverAdapter.getRouter());
 
 /* =========================
    MIDDLEWARE
