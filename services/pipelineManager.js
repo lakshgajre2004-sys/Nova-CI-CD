@@ -250,7 +250,10 @@ async function executePipeline(job) {
         const ciBranch =
           'ci-logs';
 
-        // Fetch all branches
+        // =========================
+        // FETCH REMOTE BRANCHES
+        // =========================
+
         await repoGit.fetch();
 
         const remoteBranches =
@@ -258,13 +261,30 @@ async function executePipeline(job) {
             '-r'
           ]);
 
-        // Checkout existing ci-logs
+        // =========================
+        // FORCE CLEAN WORKTREE
+        // =========================
+
+        await repoGit.reset([
+          '--hard'
+        ]);
+
+        await repoGit.clean(
+          'f',
+          ['-d']
+        );
+
+        // =========================
+        // SWITCH TO ci-logs
+        // =========================
+
         if (
           remoteBranches.all.includes(
             `origin/${ciBranch}`
           )
         ) {
 
+          // Checkout existing ci-logs branch
           await repoGit.checkout([
             '-B',
             ciBranch,
@@ -275,6 +295,45 @@ async function executePipeline(job) {
             `✅ Checked out existing ${ciBranch}`
           );
 
+        } else {
+
+          // Create fresh ci-logs branch
+          await repoGit.checkout([
+            '-b',
+            ciBranch
+          ]);
+
+          console.log(
+            `✅ Created new ${ciBranch} branch`
+          );
+
+          // Push branch upstream
+          await repoGit.push(
+            'origin',
+            ciBranch,
+            ['-u']
+          );
+        }
+
+        // =========================
+        // VERIFY ACTIVE BRANCH
+        // =========================
+
+        const activeBranch =
+          await repoGit.branchLocal();
+
+        console.log(
+          'ACTIVE BRANCH:',
+          activeBranch.current
+        );
+
+        if (
+          activeBranch.current !== ciBranch
+        ) {
+
+          throw new Error(
+            `Failed to switch to ${ciBranch}`
+          );
         } else {
 
           // Create ci-logs branch
