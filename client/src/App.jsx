@@ -2,19 +2,28 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { Toaster, toast } from 'react-hot-toast';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { BASE_URL } from './config/api';
 
 import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
-import PipelineFeed from './components/PipelineFeed';
-import WorkerPanel from './components/WorkerPanel';
-import QueueAnalytics from './components/QueueAnalytics';
 import LiveLogTerminal from './components/LiveLogTerminal';
+
+// Pages
+import Dashboard from './pages/Dashboard';
+import Pipelines from './pages/Pipelines';
+import Workers from './pages/Workers';
+import Runtime from './pages/Runtime';
+import Analytics from './pages/Analytics';
+import Deployments from './pages/Deployments';
+import Logs from './pages/Logs';
 
 export default function App() {
   const [dashboard, setDashboard] = useState({ queued: [], inProgress: [], completed: [] });
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [socket, setSocket] = useState(null);
+  const location = useLocation();
 
   const fetchDashboard = async () => {
     try {
@@ -65,15 +74,18 @@ export default function App() {
       <div className="flex flex-col flex-1 overflow-hidden relative">
         <TopNav onTrigger={() => fetchDashboard()} />
         <main className="flex-1 overflow-y-auto custom-scroll p-6">
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 max-w-screen-2xl mx-auto">
-            <div className="xl:col-span-3 space-y-6">
-              <QueueAnalytics dashboard={dashboard} />
-              <PipelineFeed dashboard={dashboard} onSelectJob={setSelectedJobId} />
-            </div>
-            <div className="space-y-6">
-              <WorkerPanel />
-            </div>
-          </div>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Dashboard dashboard={dashboard} onSelectJob={setSelectedJobId} />} />
+              <Route path="/pipelines" element={<Pipelines dashboard={dashboard} onSelectJob={setSelectedJobId} />} />
+              <Route path="/workers" element={<Workers />} />
+              <Route path="/runtime" element={<Runtime />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/deployments" element={<Deployments />} />
+              <Route path="/logs" element={<Logs />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AnimatePresence>
         </main>
       </div>
       {selectedJobId && (
