@@ -42,35 +42,6 @@ Completed: ${job.completedAt}
     // Append log entry
     fs.appendFileSync(filePath, entry);
 
-    // Verify ONLY NOVA.txt changed
-    const statusOutput = await git.raw(['status', '--porcelain']);
-
-    if (statusOutput) {
-
-      const lines = statusOutput
-        .split('\n')
-        .filter(l => l.trim().length > 0);
-
-      const nonNovaFiles = lines.filter(line => {
-        const file = line.substring(3).trim();
-        return file !== 'NOVA.txt';
-      });
-
-      if (nonNovaFiles.length > 0) {
-
-        await emitLog(
-          'Blocked unsafe auto-commit: non-NOVA files modified'
-        );
-
-        console.log(
-          '❌ Unsafe files:',
-          nonNovaFiles
-        );
-
-        return;
-      }
-    }
-
     await emitLog('📦 Staging NOVA.txt');
 
     await git.addConfig(
