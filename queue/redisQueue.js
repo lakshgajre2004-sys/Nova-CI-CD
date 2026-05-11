@@ -9,5 +9,9 @@ const connection = new IORedis({
 });
 
 const jobQueue = new Queue('nova-ci-jobs', { connection });
+const nodeQueue = new Queue('nova-node-jobs', { connection });
+const pythonQueue = new Queue('nova-python-jobs', { connection });
+const dockerQueue = new Queue('nova-docker-jobs', { connection });
+const genericQueue = new Queue('nova-generic-jobs', { connection });
 
-module.exports = { jobQueue, connection };
+module.exports = { jobQueue, nodeQueue, pythonQueue, dockerQueue, genericQueue, connection };

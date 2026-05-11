@@ -39,6 +39,7 @@ model Job {
   priority      Int      @default(0)
   priorityReason String?
   source        String
+  workerType    String?  // new field for worker type
   pipelineId  String?
   pipeline    Pipeline? @relation(fields: [pipelineId], references: [id])
   projectId   String?

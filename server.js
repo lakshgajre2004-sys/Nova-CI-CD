@@ -17,7 +17,9 @@ const projectRoutes = require('./routes/projects');
 const { addJob, initQueue } = require('./services/queue');
 const { startScheduler, startCleanupJob } = require('./services/scheduler');
 const { startArbitrationScheduler } = require('./services/arbitrationScheduler');
-const { jobQueue } = require('./queue/redisQueue');
+const { startWorkers } = require('./services/workers');
+const { determineWorkerType } = require('./services/workerRouter');
+const { jobQueue, nodeQueue, pythonQueue, dockerQueue, genericQueue } = require('./queue/redisQueue');
 
 // WebSocket
 const { init } = require('./websocket/socket');
@@ -34,7 +36,13 @@ const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/runtime');
 
 createBullBoard({
-  queues: [new BullMQAdapter(jobQueue)],
+  queues: [
+    new BullMQAdapter(jobQueue),
+    new BullMQAdapter(nodeQueue),
+    new BullMQAdapter(pythonQueue),
+    new BullMQAdapter(dockerQueue),
+    new BullMQAdapter(genericQueue)
+  ],
   serverAdapter,
   options: {
     uiConfig: {
@@ -151,7 +159,8 @@ app.post('/webhook/github', async (req, res) => {
       status: "QUEUED",
       createdAt: new Date(),
       source: "github",
-      projectId: project.id
+      projectId: project.id,
+      workerType: determineWorkerType({ repo, branch })
     };
 
     await addJob(job);
@@ -191,10 +200,10 @@ server.listen(PORT, async () => {
   await initQueue();
 
   startArbitrationScheduler();
-  startScheduler();
+  startWorkers();
   startCleanupJob();
 
-  logger.info("🧠 Scheduler, Arbitration & Cleanup Job started");
+  logger.info("🧠 Arbitration Scheduler, Multi-Workers & Cleanup Job started");
 });
 
 

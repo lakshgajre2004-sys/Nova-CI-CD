@@ -1,4 +1,5 @@
 const { jobQueue } = require('../queue/redisQueue');
+const { determineWorkerType, getQueueForType } = require('./workerRouter');
 const logger = require('../config/logger');
 
 let pendingJobs = [];
@@ -36,7 +37,9 @@ function startArbitrationScheduler() {
 
     for (const item of jobsToSchedule) {
       try {
-        await jobQueue.add(
+        const workerType = determineWorkerType(item.jobData);
+        const queue = getQueueForType(workerType);
+        await queue.add(
           'execute-pipeline',
           item.jobData,
           {
@@ -44,7 +47,7 @@ function startArbitrationScheduler() {
             priority: item.priorityInfo.bullmqPriority // Set BullMQ priority to maintain queue correctness
           }
         );
-        logger.info(`[Arbitration] Scheduled Job ${item.jobData.id} with BullMQ Priority: ${item.priorityInfo.bullmqPriority}`);
+        logger.info(`[Arbitration] Scheduled Job ${item.jobData.id} to ${workerType} queue with BullMQ Priority: ${item.priorityInfo.bullmqPriority}`);
       } catch (err) {
         logger.error(`[Arbitration] Failed to schedule job ${item.jobData.id}`, err);
       }

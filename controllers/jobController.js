@@ -3,6 +3,7 @@ const store = require('../models/JobStore');
 const { parseStages } = require('../services/jenkinsfileParser');
 const { schedule } = require('../services/scheduler');
 const { broadcastJobUpdate } = require('../websocket/socket');
+const { determineWorkerType } = require('../services/workerRouter');
 
 function getPriority(branch) {
   if (branch === 'main') return 1;
@@ -38,7 +39,8 @@ function triggerJob(req, res) {
     startedAt: null,
     completedAt: null,
     shouldFail: Boolean(shouldFail), // Optional flag to simulate failure
-    logs: [] // array of strings
+    logs: [], // array of strings
+    workerType: determineWorkerType({ repo, branch })
   };
 
   store.addJob(job);
