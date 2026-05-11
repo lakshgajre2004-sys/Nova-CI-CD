@@ -16,6 +16,7 @@ const projectRoutes = require('./routes/projects');
 // Services
 const { addJob, initQueue } = require('./services/queue');
 const { startScheduler, startCleanupJob } = require('./services/scheduler');
+const { startArbitrationScheduler } = require('./services/arbitrationScheduler');
 const { jobQueue } = require('./queue/redisQueue');
 
 // WebSocket
@@ -189,10 +190,11 @@ server.listen(PORT, async () => {
 
   await initQueue();
 
+  startArbitrationScheduler();
   startScheduler();
   startCleanupJob();
 
-  logger.info("🧠 Scheduler & Cleanup Job started");
+  logger.info("🧠 Scheduler, Arbitration & Cleanup Job started");
 });
 
 

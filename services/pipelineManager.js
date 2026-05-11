@@ -9,25 +9,101 @@ const prisma = require('../db/index');
 /* =========================
    NOVA.txt SAFE PUSH
 ========================= */
-async function appendToNovaFile(job, repoDir, emitLog) {
+async function appendToNovaFile(job, emitLog) {
 
   try {
 
-    const git = simpleGit(repoDir);
+    // =========================
+    // NOVA ORCHESTRATOR REPO
+    // =========================
 
-    const filePath = path.join(
-      repoDir,
-      'NOVA.txt'
+    const novaRepoPath = path.join(
+      __dirname,
+      '..'
     );
 
+    const auditGit =
+      simpleGit(novaRepoPath);
+
+    const ciBranch =
+      'ci-logs';
+
     await emitLog(
-      '📝 Updating NOVA.txt'
+      '[CI-LOGS] Starting audit push'
+    );
+
+    // =========================
+    // FETCH REMOTES
+    // =========================
+
+    await auditGit.fetch();
+
+    const branches =
+      await auditGit.branch([
+        '-a'
+      ]);
+
+    // =========================
+    // ENSURE ci-logs EXISTS
+    // =========================
+
+    if (
+      branches.all.includes(
+        `remotes/origin/${ciBranch}`
+      )
+    ) {
+
+      await auditGit.checkout(
+        ciBranch
+      );
+
+      await auditGit.pull(
+        'origin',
+        ciBranch
+      );
+
+      console.log(
+        `✅ Checked out existing ${ciBranch}`
+      );
+
+    } else {
+
+      await auditGit.checkoutLocalBranch(
+        ciBranch
+      );
+
+      console.log(
+        `✅ Created new ${ciBranch}`
+      );
+
+      await auditGit.push(
+        'origin',
+        ciBranch,
+        ['-u']
+      );
+    }
+
+    // =========================
+    // NOVA.txt LOCATION
+    // =========================
+
+    const filePath = path.join(
+      novaRepoPath,
+      'NOVA.txt'
     );
 
     // Ensure NOVA.txt exists
     if (!fs.existsSync(filePath)) {
-      fs.writeFileSync(filePath, '');
+
+      fs.writeFileSync(
+        filePath,
+        ''
+      );
     }
+
+    // =========================
+    // APPEND AUDIT ENTRY
+    // =========================
 
     const entry = `
 ========================================
@@ -35,6 +111,7 @@ Job ID: ${job.id}
 Repository: ${job.repo}
 Branch: ${job.branch}
 Status: ${job.status}
+Priority: ${job.priorityReason || 'Default'}
 Started: ${job.startedAt}
 Completed: ${job.completedAt}
 ========================================
@@ -48,28 +125,38 @@ Completed: ${job.completedAt}
     );
 
     await emitLog(
-      '📦 Staging NOVA.txt'
+      '[CI-LOGS] Staging NOVA.txt'
     );
 
-    await git.addConfig(
+    // =========================
+    // GIT CONFIG
+    // =========================
+
+    await auditGit.addConfig(
       'user.email',
       'ci@nova.com'
     );
 
-    await git.addConfig(
+    await auditGit.addConfig(
       'user.name',
       'Nova CI'
     );
 
-    // Stage ONLY NOVA.txt
-    await git.add('./NOVA.txt');
+    // =========================
+    // STAGE FILE
+    // =========================
 
-    // Verify staged changes
+    await auditGit.add(
+      './NOVA.txt'
+    );
+
     const staged =
-      await git.diff(['--cached']);
+      await auditGit.diff([
+        '--cached'
+      ]);
 
     console.log(
-      'STAGED DIFF:',
+      '[CI-LOGS] STAGED:',
       staged
     );
 
@@ -77,56 +164,113 @@ Completed: ${job.completedAt}
       !staged ||
       staged.trim().length === 0
     ) {
-      throw new Error(
-        'NOVA.txt was not staged properly'
+
+      await emitLog(
+        '[CI-LOGS] No changes detected'
       );
+
+      return;
     }
 
+    // =========================
+    // COMMIT
+    // =========================
+
     await emitLog(
-      '📝 Creating CI commit'
+      '[CI-LOGS] Creating commit'
     );
 
     const commitResult =
-      await git.commit(
+      await auditGit.commit(
         'Nova CI Update [skip ci]'
       );
 
     console.log(
-      'COMMIT RESULT:',
+      '[CI-LOGS] COMMIT:',
       commitResult
     );
 
+    // =========================
+    // PUSH
+    // =========================
+
     await emitLog(
-      '⬆️ Pushing CI logs branch'
+      '[CI-LOGS] Pushing ci-logs branch'
     );
 
-    const ciBranch = 'ci-logs';
-
     const pushResult =
-      await git.push(
+      await auditGit.push(
         'origin',
-        `HEAD:${ciBranch}`
+        ciBranch
       );
 
     console.log(
-      '✅ PUSH RESULT:',
+      '[CI-LOGS] PUSH:',
       pushResult
     );
 
     await emitLog(
-      '✅ NOVA.txt pushed successfully'
+      '[CI-LOGS] Push successful'
     );
 
   } catch (err) {
 
     console.error(
-      '❌ NOVA PUSH ERROR:',
+      '[CI-LOGS ERROR]',
       err
     );
 
     await emitLog(
-      `❌ NOVA push failed: ${err.message}`
+      `[CI-LOGS] Push failed: ${err.message}`
     );
+  }
+}
+
+/* =========================
+   PUSH TO TARGET REPO (PHASE 7)
+========================= */
+async function pushMetadataToTarget(job, repoDir, emitLog) {
+  try {
+    const git = simpleGit(repoDir);
+    const sourceBranch = job.branch || 'main';
+
+    await emitLog('📝 Preparing target branch metadata');
+
+    // Switch back to the source branch
+    await git.checkout(sourceBranch);
+
+    // Create build metadata
+    const metadataPath = path.join(repoDir, '.nova-build.json');
+    const metadata = {
+      jobId: job.id,
+      status: job.status,
+      completedAt: job.completedAt,
+      priority: job.priorityScore || 0,
+      priorityReason: job.priorityReason || 'Default'
+    };
+
+    fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+
+    await git.add('.nova-build.json');
+
+    const staged = await git.diff(['--cached']);
+    if (staged && staged.trim().length > 0) {
+      await emitLog('📝 Committing build metadata to target branch');
+      await git.commit(`ci(nova): update build metadata for job ${job.id} [skip ci]`);
+
+      await emitLog(`⬆️ Pushing to target branch: ${sourceBranch}`);
+      await git.push('origin', sourceBranch);
+      await emitLog('✅ Target branch push successful');
+    } else {
+      await emitLog('ℹ️ No metadata changes to push to target branch');
+    }
+
+    // Switch back to ci-logs for existing logic if needed
+    await git.checkout('ci-logs');
+
+  } catch (err) {
+    console.error('❌ TARGET PUSH ERROR:', err);
+    await emitLog(`❌ Target push failed: ${err.message}`);
   }
 }
 
@@ -595,9 +739,14 @@ async function executePipeline(job) {
 
       if (!failed) {
 
-        await appendToNovaFile(
+        await pushMetadataToTarget(
           job,
           repoDir,
+          emitLog
+        );
+
+        await appendToNovaFile(
+          job,
           emitLog
         );
       }

@@ -110,7 +110,7 @@ async function getDashboard(req, res) {
     }
 
     dashboard.queued.sort(
-      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      (a, b) => (b.priority || 0) - (a.priority || 0) || new Date(a.createdAt) - new Date(b.createdAt)
     );
 
     dashboard.inProgress.sort(

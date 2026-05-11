@@ -18,7 +18,7 @@ function startScheduler() {
     }
   }, {
     connection,
-    concurrency: 4 // Allow 4 concurrent jobs per server instance
+    concurrency: 1 // Allow 1 concurrent jobs per server instance
   });
 
   workerInstance.on('completed', (job) => {

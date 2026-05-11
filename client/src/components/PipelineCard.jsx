@@ -6,7 +6,8 @@ import {
   Globe,
   Clock,
   Server,
-  Terminal
+  Terminal,
+  AlertCircle
 } from 'lucide-react';
 
 import AnimatedStage from './AnimatedStage';
@@ -35,6 +36,15 @@ export default function PipelineCard({
     FAILED:
       'border-[#ef4444]/50 shadow-[0_0_15px_rgba(239,68,68,0.15)] bg-[#ef4444]/5'
   };
+
+  const getPriorityDetails = (score) => {
+    if (score >= 100) return { level: 'Critical', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' };
+    if (score >= 70) return { level: 'High', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/20' };
+    if (score >= 40) return { level: 'Medium', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20' };
+    return { level: 'Low', color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20' };
+  };
+
+  const priority = getPriorityDetails(job.priority || 0);
 
   const statusGlow = {
     QUEUED:
@@ -178,6 +188,17 @@ export default function PipelineCard({
                   || 'Pending'
                 }
               </span>
+
+              {/* PRIORITY INDICATOR */}
+              {job.priority !== undefined && (
+                <span className={`flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${priority.bg} ${priority.border} ${priority.color}`}>
+                  <AlertCircle className="w-3 h-3 mr-1" />
+                  {priority.level} ({job.priority})
+                  <span className="hidden sm:inline ml-1 opacity-70 font-normal">
+                    — {job.priorityReason?.split(',')[0]}
+                  </span>
+                </span>
+              )}
 
             </div>
           </div>

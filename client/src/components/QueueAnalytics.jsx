@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { Layers, CheckCircle, Clock, AlertTriangle, Activity, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function QueueAnalytics({ dashboard }) {
@@ -12,11 +12,14 @@ export default function QueueAnalytics({ dashboard }) {
   
   const total = queued + inProgress + success + failed;
   
+  const criticalQueued = dashboard.queued?.filter(j => j.priority >= 100).length || 0;
+  const highQueued = dashboard.queued?.filter(j => j.priority >= 70 && j.priority < 100).length || 0;
+  
   const stats = [
-    { label: 'Active Pipelines', value: inProgress, icon: Clock, color: 'text-[#3b82f6]', bg: 'bg-[#3b82f6]/10', border: 'border-[#3b82f6]/30', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.2)]' },
-    { label: 'Pipeline Queue', value: queued, icon: Layers, color: 'text-[#f59e0b]', bg: 'bg-[#f59e0b]/10', border: 'border-[#f59e0b]/30', shadow: 'shadow-[0_0_15px_rgba(245,158,11,0.2)]' },
-    { label: 'Successful Executions', value: success, icon: CheckCircle, color: 'text-[#10b981]', bg: 'bg-[#10b981]/10', border: 'border-[#10b981]/30', shadow: 'shadow-[0_0_15px_rgba(16,185,129,0.2)]' },
-    { label: 'Failed Pipelines', value: failed, icon: AlertTriangle, color: 'text-[#ef4444]', bg: 'bg-[#ef4444]/10', border: 'border-[#ef4444]/30', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.2)]' },
+    { label: 'Active Executions', value: inProgress, icon: Activity, color: 'text-[#3b82f6]', bg: 'bg-[#3b82f6]/10', border: 'border-[#3b82f6]/30', shadow: 'shadow-[0_0_15px_rgba(59,130,246,0.2)]' },
+    { label: 'Queue Arbitration', value: queued, icon: Layers, color: 'text-[#f59e0b]', bg: 'bg-[#f59e0b]/10', border: 'border-[#f59e0b]/30', shadow: 'shadow-[0_0_15px_rgba(245,158,11,0.2)]' },
+    { label: 'Critical / High Wait', value: `${criticalQueued} / ${highQueued}`, icon: Target, color: 'text-[#ef4444]', bg: 'bg-[#ef4444]/10', border: 'border-[#ef4444]/30', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.2)]' },
+    { label: 'Successful Throughput', value: success, icon: CheckCircle, color: 'text-[#10b981]', bg: 'bg-[#10b981]/10', border: 'border-[#10b981]/30', shadow: 'shadow-[0_0_15px_rgba(16,185,129,0.2)]' },
   ];
 
   return (

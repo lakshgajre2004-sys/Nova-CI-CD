@@ -1,5 +1,6 @@
 const prisma = require('../db/index');
 const { jobQueue } = require('../queue/redisQueue');
+const { addPendingJob } = require('./arbitrationScheduler');
 
 const DEFAULT_JOB_OPTIONS = {
   attempts: 3,
@@ -10,6 +11,9 @@ const DEFAULT_JOB_OPTIONS = {
    ADD JOB
 ========================= */
 async function addJob(job) {
+  const { calculatePriority } = require('./priority');
+  const priorityInfo = calculatePriority(job);
+
   // Save job to database first
   await prisma.job.create({
     data: {
@@ -20,11 +24,24 @@ async function addJob(job) {
       status: job.status,
       source: job.source,
       createdAt: job.createdAt,
-      projectId: job.projectId
+      projectId: job.projectId,
+      priority: priorityInfo.score,
+      priorityReason: priorityInfo.reason
     }
   });
 
-  await jobQueue.add('execute-pipeline', job, { jobId: job.id, ...DEFAULT_JOB_OPTIONS });
+  addPendingJob(
+    {
+      ...job,
+      priorityScore: priorityInfo.score,
+      priorityReason: priorityInfo.reason
+    },
+    {
+      jobId: job.id,
+      ...DEFAULT_JOB_OPTIONS
+    },
+    priorityInfo
+  );
 }
 
 /* =========================
@@ -36,11 +53,24 @@ async function initQueue() {
     where: { status: 'QUEUED' },
     orderBy: { createdAt: 'asc' }
   });
-  
+
   for (const job of queuedJobs) {
     const jobState = await jobQueue.getJob(job.id);
     if (!jobState) {
-      await jobQueue.add('execute-pipeline', job, { jobId: job.id, ...DEFAULT_JOB_OPTIONS });
+      const { calculatePriority } = require('./priority');
+      const priorityInfo = calculatePriority(job);
+      addPendingJob(
+        {
+          ...job,
+          priorityScore: priorityInfo.score,
+          priorityReason: priorityInfo.reason
+        },
+        {
+          jobId: job.id,
+          ...DEFAULT_JOB_OPTIONS
+        },
+        priorityInfo
+      );
     }
   }
 }
@@ -49,7 +79,21 @@ async function initQueue() {
    REQUEUE JOB
 ========================= */
 async function requeueJob(job) {
-  await jobQueue.add('execute-pipeline', job, { jobId: job.id, ...DEFAULT_JOB_OPTIONS });
+  const { calculatePriority } = require('./priority');
+  const priorityInfo = calculatePriority({ ...job, isRetry: true }); // Boost priority for retries
+
+  addPendingJob(
+    {
+      ...job,
+      priorityScore: priorityInfo.score,
+      priorityReason: priorityInfo.reason
+    },
+    {
+      jobId: job.id,
+      ...DEFAULT_JOB_OPTIONS
+    },
+    priorityInfo
+  );
 }
 
 module.exports = {

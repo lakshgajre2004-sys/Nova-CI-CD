@@ -26,12 +26,14 @@ router.post('/github', (req, res) => {
 
     const repo = payload.repository.full_name;
     const branch = payload.ref.split('/').pop();
+    const commit = payload.head_commit ? payload.head_commit.id : null;
+    const message = payload.head_commit ? payload.head_commit.message : '';
 
     console.log('[Webhook] Received push event');
     console.log(`[Webhook] Triggered job for ${repo} (${branch})`);
 
     // Mock req/res to reuse existing controller
-    const mockReq = { body: { repo, branch } };
+    const mockReq = { body: { repo, branch, commit, message, source: 'github_webhook' } };
     const mockRes = {
       status: function () { return this; },
       json: function () { return this; }

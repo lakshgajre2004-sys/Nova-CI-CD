@@ -36,6 +36,8 @@ model Job {
   completedAt DateTime?
   duration      Int?     // duration in milliseconds
   failureReason String?
+  priority      Int      @default(0)
+  priorityReason String?
   source        String
   pipelineId  String?
   pipeline    Pipeline? @relation(fields: [pipelineId], references: [id])
