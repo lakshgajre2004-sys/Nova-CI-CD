@@ -3,7 +3,7 @@ const { jobQueue } = require('../queue/redisQueue');
 const { addPendingJob } = require('./arbitrationScheduler');
 
 const DEFAULT_JOB_OPTIONS = {
-  attempts: 3,
+  attempts: 1,
   backoff: { type: 'exponential', delay: 2000 }
 };
 

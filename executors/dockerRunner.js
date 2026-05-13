@@ -7,8 +7,7 @@ function runCommand(cmd, cwd, emitLog, timeoutMs = 120000, jobId = 'default') {
     emitLog(`[Execution] ${cmd}`);
 
     // Hardened docker command: unique name, limits, auto-remove
-    const containerName = `nova-job-${jobId}`;
-    const dockerCmd = `docker run --rm --name ${containerName} --memory="512m" --cpus="1.0" -v "${cwd}":/app -w /app node:18 /bin/sh -c "${cmd}"`;
+    const dockerCmd = cmd;
 
     const finalCmd = cmd.startsWith('docker ') ? cmd : dockerCmd;
 

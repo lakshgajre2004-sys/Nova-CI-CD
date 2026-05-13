@@ -10,7 +10,7 @@ export default function WorkerPanel() {
   useEffect(() => {
     const fetchWorkers = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/jobs/workers`);
+        const res = await axios.get(`${BASE_URL}/api/workers`);
         setWorkers(res.data);
       } catch (err) {
         console.error("Failed to fetch workers", err);
@@ -18,7 +18,7 @@ export default function WorkerPanel() {
     };
 
     fetchWorkers();
-    const interval = setInterval(fetchWorkers, 3000);
+    const interval = setInterval(fetchWorkers, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -38,7 +38,7 @@ export default function WorkerPanel() {
         {workers.length > 0 ? (
           workers.map((worker, idx) => (
             <motion.div 
-              key={worker.id}
+              key={worker.name || idx}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.1 }}
@@ -52,35 +52,41 @@ export default function WorkerPanel() {
                     <Cpu className="w-4 h-4 text-[#66fcf1]" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs text-[#c5c6c7] font-bold">Nova Worker-{worker.id.slice(0, 4)}</span>
+                    <span className="text-xs text-[#c5c6c7] font-bold">{worker.name}</span>
                     <span className="text-[10px] text-[#45a29e] flex items-center mt-0.5">
-                      <Activity className="w-3 h-3 mr-1" /> Uptime: 99.9%
+                      <Activity className="w-3 h-3 mr-1" /> Queue: {worker.queue}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b981] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10b981]"></span>
-                  </span>
+                  {worker.active ? (
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b981] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10b981]"></span>
+                    </span>
+                  ) : (
+                    <span className="relative flex h-2 w-2">
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-2 relative z-10">
                 <div className="flex justify-between text-xs">
                   <span className="text-[#45a29e]">Current Load</span>
-                  <span className="text-white font-mono">{worker.jobsRunning} / {worker.concurrency} pipelines</span>
+                  <span className="text-white font-mono">{worker.jobsRunning || 0} / {worker.concurrency} pipelines</span>
                 </div>
                 <div className="w-full bg-[#1f2833] rounded-full h-1.5">
                   <div 
                     className="bg-gradient-to-r from-[#45a29e] to-[#66fcf1] h-1.5 rounded-full shadow-[0_0_5px_rgba(102,252,241,0.5)] transition-all duration-500" 
-                    style={{ width: `${(worker.jobsRunning / worker.concurrency) * 100}%` }}
+                    style={{ width: `${((worker.jobsRunning || 0) / worker.concurrency) * 100}%` }}
                   ></div>
                 </div>
                 <div className="flex justify-between text-[10px] text-[#c5c6c7] pt-2 border-t border-[#2a313c] mt-2">
                   <span>Specialization:</span>
                   <span className="px-1.5 py-0.5 bg-[#1f2833] rounded border border-[#2a313c] flex items-center">
-                    <Zap className="w-3 h-3 mr-1 text-[#f59e0b]" /> General
+                    <Zap className="w-3 h-3 mr-1 text-[#f59e0b]" /> Type: {worker.type}
                   </span>
                 </div>
               </div>

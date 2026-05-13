@@ -17,7 +17,19 @@ function determineWorkerType(jobData) {
 
   /*
   ========================================
-  1. CRITICAL DOCKER DETECTION FIRST
+  EXTRACT REPO NAME
+  ========================================
+  */
+
+  const repoName =
+    repo
+      .split('/')
+      .pop()
+      .replace('.git', '');
+
+  /*
+  ========================================
+  1. CRITICAL DOCKER DETECTION
   ========================================
   */
 
@@ -30,6 +42,10 @@ function determineWorkerType(jobData) {
     branch.includes('container') ||
     branch.includes('k8s')
   ) {
+
+    console.log(
+      `[WorkerRouter] ${repoName} routed to DOCKER worker (keyword match)`
+    );
 
     return 'docker';
   }
@@ -46,6 +62,10 @@ function determineWorkerType(jobData) {
     repo.includes('flask') ||
     repo.includes('fastapi')
   ) {
+
+    console.log(
+      `[WorkerRouter] ${repoName} routed to PYTHON worker (keyword match)`
+    );
 
     return 'python';
   }
@@ -64,6 +84,10 @@ function determineWorkerType(jobData) {
     repo.includes('javascript')
   ) {
 
+    console.log(
+      `[WorkerRouter] ${repoName} routed to NODE worker (keyword match)`
+    );
+
     return 'node';
   }
 
@@ -75,86 +99,138 @@ function determineWorkerType(jobData) {
 
   try {
 
-    const repoPath = path.join(
-      __dirname,
-      '..',
-      'repos',
-      repo.replace('/', '-')
-    );
+    /*
+    ====================================
+    LOCAL DEV REPO PATHS
+    ====================================
+    */
 
-    if (fs.existsSync(repoPath)) {
+    const possiblePaths = [
 
-      const files = fs.readdirSync(
-        repoPath,
-        { recursive: true }
-      );
+      path.join(
+        __dirname,
+        '..',
+        repoName
+      ),
 
-      /*
-      ====================================
-      DOCKER FILE DETECTION FIRST
-      ====================================
-      */
+      path.join(
+        __dirname,
+        '..',
+        'temp-repos',
+        repoName
+      )
+    ];
 
-      if (
-        files.some(file =>
+    let repoPath = null;
 
-          file === 'Dockerfile' ||
+    for (const p of possiblePaths) {
 
-          file === 'docker-compose.yml' ||
+      if (fs.existsSync(p)) {
 
-          file.endsWith('.dockerfile')
-        )
-      ) {
-
-        return 'docker';
-      }
-
-      /*
-      ====================================
-      PYTHON FILE DETECTION
-      ====================================
-      */
-
-      if (
-        files.some(file =>
-
-          file.endsWith('.py') ||
-
-          file === 'requirements.txt' ||
-
-          file === 'Pipfile' ||
-
-          file === 'pyproject.toml'
-        )
-      ) {
-
-        return 'python';
-      }
-
-      /*
-      ====================================
-      NODE FILE DETECTION
-      ====================================
-      */
-
-      if (
-        files.some(file =>
-
-          file === 'package.json' ||
-
-          file.endsWith('.js') ||
-
-          file.endsWith('.jsx') ||
-
-          file.endsWith('.ts') ||
-
-          file.endsWith('.tsx')
-        )
-      ) {
-
-        return 'node';
+        repoPath = p;
+        break;
       }
     }
+
+    if (!repoPath) {
+
+      console.log(
+        `[WorkerRouter] Repo path not found for ${repoName}`
+      );
+
+      return 'generic';
+    }
+
+    console.log(
+      `[WorkerRouter] Inspecting repo path: ${repoPath}`
+    );
+
+    const files = fs.readdirSync(
+      repoPath,
+      { recursive: true }
+    );
+
+    /*
+    ====================================
+    DOCKER DETECTION FIRST
+    ====================================
+    */
+
+    if (
+      files.some(file =>
+
+        file === 'Dockerfile' ||
+
+        file === 'docker-compose.yml' ||
+
+        file.endsWith('.dockerfile')
+      )
+    ) {
+
+      console.log(
+        `[WorkerRouter] ${repoName} routed to DOCKER worker`
+      );
+
+      return 'docker';
+    }
+
+    /*
+    ====================================
+    PYTHON DETECTION SECOND
+    ====================================
+    */
+
+    if (
+      files.some(file =>
+
+        file.endsWith('.py') ||
+
+        file === 'requirements.txt' ||
+
+        file === 'Pipfile' ||
+
+        file === 'pyproject.toml'
+      )
+    ) {
+
+      console.log(
+        `[WorkerRouter] ${repoName} routed to PYTHON worker`
+      );
+
+      return 'python';
+    }
+
+    /*
+    ====================================
+    NODE DETECTION LAST
+    ====================================
+    */
+
+    if (
+      files.some(file =>
+
+        file === 'package.json' ||
+
+        file.endsWith('.js') ||
+
+        file.endsWith('.jsx') ||
+
+        file.endsWith('.ts') ||
+
+        file.endsWith('.tsx')
+      )
+    ) {
+
+      console.log(
+        `[WorkerRouter] ${repoName} routed to NODE worker`
+      );
+
+      return 'node';
+    }
+
+    console.log(
+      `[WorkerRouter] ${repoName} routed to GENERIC worker`
+    );
 
   } catch (err) {
 
@@ -214,3 +290,4 @@ module.exports = {
   determineWorkerType,
   getQueueForType
 };
+

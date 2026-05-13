@@ -19,7 +19,7 @@ function startArbitrationScheduler() {
   if (intervalId) return;
 
   logger.info("🧠 Arbitration Scheduler started. Arbitration interval: 10 seconds.");
-  
+
   intervalId = setInterval(async () => {
     if (pendingJobs.length === 0) return;
 
@@ -53,7 +53,7 @@ function startArbitrationScheduler() {
       }
     }
 
-  }, 10000); // Every 10 seconds
+  }, 15000); // Every 15 seconds
 }
 
 module.exports = {

@@ -1,48 +1,74 @@
-const { parseYamlConfig } = require('../config/yamlParser');
+const { parseYamlConfig } =
+  require('../config/yamlParser');
 
-function getPipelineConfig(repoDir) {
+const {
+  parseJenkinsfile,
+  parseStages
+} = require('../services/jenkinsfileParser');
+function getPipelineConfig(
+  repoDir,
+  repo = 'repo1',
+  branch = 'main'
+) {
 
-  // 1. Check for YAML config (.nova-ci.yml)
-  const yamlStages = parseYamlConfig(repoDir);
+  /*
+  ============================================
+  1. YAML CONFIG
+  ============================================
+  */
 
-  if (yamlStages && yamlStages.length > 0) {
+  const yamlStages =
+    parseYamlConfig(repoDir);
+
+  if (
+    yamlStages &&
+    yamlStages.length > 0
+  ) {
+
+    console.log(
+      '✅ Using .nova-ci.yml pipeline'
+    );
+
     return yamlStages;
   }
 
   /*
-    =====================================================
-    DEFAULT PIPELINE
-    Added artificial delay to demonstrate:
-    - queue backlog
-    - priority dequeueing
-    - non-FIFO scheduling
-    =====================================================
+  ============================================
+  2. JENKINSFILE PARSER
+  ============================================
   */
 
-  return [
+  const parsedStages =
+    parseJenkinsfile(repoDir);
 
-    {
-      name: "Install Dependencies",
-      commands: [
-        "npm install"
-      ]
-    },
+  if (
+    parsedStages &&
+    parsedStages.length > 0
+  ) {
 
-    {
-      name: "Build Project",
-      commands: [
-        "npm run build"
-      ]
-    },
+    console.log(
+      '✅ Using Jenkinsfile pipeline'
+    );
 
-    {
-      name: "Test",
-      commands: [
-        "npm test"
-      ]
-    }
+    return parsedStages;
+  }
 
-  ];
+  /*
+  ============================================
+  3. REPO DEFAULT PIPELINE
+  ============================================
+  */
+
+  console.log(
+    '⚠ Falling back to default pipeline'
+  );
+
+  return parseStages(
+    repo,
+    branch
+  );
 }
 
-module.exports = { getPipelineConfig };
+module.exports = {
+  getPipelineConfig
+};

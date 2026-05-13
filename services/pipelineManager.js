@@ -13,39 +13,37 @@ async function appendToNovaFile(job, emitLog) {
 
   try {
 
-    // =========================
-    // NOVA ORCHESTRATOR REPO
-    // =========================
-
-    const novaRepoPath = path.join(
+    const tempLogsDir = path.join(
       __dirname,
-      '..'
+      '..',
+      'temp',
+      `ci-logs-${Date.now()}`
     );
 
-    const auditGit =
-      simpleGit(novaRepoPath);
+    const repoUrl =
+      process.env.GITHUB_REPO_URL;
 
     const ciBranch =
       'ci-logs';
 
     await emitLog(
-      '[CI-LOGS] Starting audit push'
+      '[CI-LOGS] Creating isolated logging workspace'
     );
 
-    // =========================
-    // FETCH REMOTES
-    // =========================
+    await simpleGit().clone(
+      repoUrl,
+      tempLogsDir
+    );
 
-    await auditGit.fetch();
+    const git =
+      simpleGit(tempLogsDir);
+
+    await git.fetch();
 
     const branches =
-      await auditGit.branch([
+      await git.branch([
         '-a'
       ]);
-
-    // =========================
-    // ENSURE ci-logs EXISTS
-    // =========================
 
     if (
       branches.all.includes(
@@ -53,46 +51,31 @@ async function appendToNovaFile(job, emitLog) {
       )
     ) {
 
-      await auditGit.checkout(
-        ciBranch
-      );
-
-      await auditGit.pull(
-        'origin',
-        ciBranch
-      );
-
-      console.log(
-        `✅ Checked out existing ${ciBranch}`
-      );
+      await git.checkout([
+        '-B',
+        ciBranch,
+        `origin/${ciBranch}`
+      ]);
 
     } else {
 
-      await auditGit.checkoutLocalBranch(
+      await git.checkoutLocalBranch(
         ciBranch
       );
 
-      console.log(
-        `✅ Created new ${ciBranch}`
-      );
-
-      await auditGit.push(
+      await git.push(
         'origin',
         ciBranch,
         ['-u']
       );
     }
 
-    // =========================
-    // NOVA.txt LOCATION
-    // =========================
+    const filePath =
+      path.join(
+        tempLogsDir,
+        'NOVA.txt'
+      );
 
-    const filePath = path.join(
-      novaRepoPath,
-      'NOVA.txt'
-    );
-
-    // Ensure NOVA.txt exists
     if (!fs.existsSync(filePath)) {
 
       fs.writeFileSync(
@@ -100,10 +83,6 @@ async function appendToNovaFile(job, emitLog) {
         ''
       );
     }
-
-    // =========================
-    // APPEND AUDIT ENTRY
-    // =========================
 
     const entry = `
 ========================================
@@ -124,93 +103,56 @@ Completed: ${job.completedAt}
       'utf8'
     );
 
-    await emitLog(
-      '[CI-LOGS] Staging NOVA.txt'
-    );
-
-    // =========================
-    // GIT CONFIG
-    // =========================
-
-    await auditGit.addConfig(
+    await git.addConfig(
       'user.email',
       'ci@nova.com'
     );
 
-    await auditGit.addConfig(
+    await git.addConfig(
       'user.name',
       'Nova CI'
     );
 
-    // =========================
-    // STAGE FILE
-    // =========================
-
-    await auditGit.add(
+    await git.add(
       './NOVA.txt'
     );
 
     const staged =
-      await auditGit.diff([
+      await git.diff([
         '--cached'
       ]);
 
-    console.log(
-      '[CI-LOGS] STAGED:',
-      staged
-    );
-
     if (
-      !staged ||
-      staged.trim().length === 0
+      staged &&
+      staged.trim().length > 0
     ) {
 
-      await emitLog(
-        '[CI-LOGS] No changes detected'
-      );
-
-      return;
-    }
-
-    // =========================
-    // COMMIT
-    // =========================
-
-    await emitLog(
-      '[CI-LOGS] Creating commit'
-    );
-
-    const commitResult =
-      await auditGit.commit(
+      await git.commit(
         'Nova CI Update [skip ci]'
       );
 
-    console.log(
-      '[CI-LOGS] COMMIT:',
-      commitResult
-    );
-
-    // =========================
-    // PUSH
-    // =========================
-
-    await emitLog(
-      '[CI-LOGS] Pushing ci-logs branch'
-    );
-
-    const pushResult =
-      await auditGit.push(
+      await git.push(
         'origin',
         ciBranch
       );
 
-    console.log(
-      '[CI-LOGS] PUSH:',
-      pushResult
-    );
+      await emitLog(
+        '[CI-LOGS] Push successful'
+      );
 
-    await emitLog(
-      '[CI-LOGS] Push successful'
+    } else {
+
+      await emitLog(
+        '[CI-LOGS] No changes detected'
+      );
+    }
+
+    fs.rmSync(
+      tempLogsDir,
+      {
+        recursive: true,
+        force: true
+      }
     );
 
   } catch (err) {
@@ -227,50 +169,102 @@ Completed: ${job.completedAt}
 }
 
 /* =========================
-   PUSH TO TARGET REPO (PHASE 7)
+   PUSH TO TARGET REPO
 ========================= */
 async function pushMetadataToTarget(job, repoDir, emitLog) {
+
   try {
-    const git = simpleGit(repoDir);
-    const sourceBranch = job.branch || 'main';
 
-    await emitLog('📝 Preparing target branch metadata');
+    const git =
+      simpleGit(repoDir);
 
-    // Switch back to the source branch
-    await git.checkout(sourceBranch);
+    const sourceBranch =
+      job.branch || 'main';
 
-    // Create build metadata
-    const metadataPath = path.join(repoDir, '.nova-build.json');
+    await emitLog(
+      '📝 Preparing target branch metadata'
+    );
+
+    await git.checkout(
+      sourceBranch
+    );
+
+    const metadataPath =
+      path.join(
+        repoDir,
+        '.nova-build.json'
+      );
+
     const metadata = {
       jobId: job.id,
       status: job.status,
       completedAt: job.completedAt,
       priority: job.priorityScore || 0,
-      priorityReason: job.priorityReason || 'Default'
+      priorityReason:
+        job.priorityReason || 'Default'
     };
 
-    fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+    fs.writeFileSync(
+      metadataPath,
+      JSON.stringify(
+        metadata,
+        null,
+        2
+      )
+    );
 
-    await git.add('.nova-build.json');
+    await git.add(
+      '.nova-build.json'
+    );
 
-    const staged = await git.diff(['--cached']);
-    if (staged && staged.trim().length > 0) {
-      await emitLog('📝 Committing build metadata to target branch');
-      await git.commit(`ci(nova): update build metadata for job ${job.id} [skip ci]`);
+    const staged =
+      await git.diff([
+        '--cached'
+      ]);
 
-      await emitLog(`⬆️ Pushing to target branch: ${sourceBranch}`);
-      await git.push('origin', sourceBranch);
-      await emitLog('✅ Target branch push successful');
+    if (
+      staged &&
+      staged.trim().length > 0
+    ) {
+
+      await emitLog(
+        '📝 Committing build metadata'
+      );
+
+      await git.commit(
+        `ci(nova): update build metadata for job ${job.id} [skip ci]`
+      );
+
+      await emitLog(
+        `⬆️ Pushing to branch: ${sourceBranch}`
+      );
+
+      await git.push(
+        'origin',
+        sourceBranch
+      );
+
+      await emitLog(
+        '✅ Target branch push successful'
+      );
+
     } else {
-      await emitLog('ℹ️ No metadata changes to push to target branch');
+
+      await emitLog(
+        'ℹ️ No metadata changes to push'
+      );
     }
 
-    // Switch back to ci-logs for existing logic if needed
-    await git.checkout('ci-logs');
-
   } catch (err) {
-    console.error('❌ TARGET PUSH ERROR:', err);
-    await emitLog(`❌ Target push failed: ${err.message}`);
+
+    console.error(
+      '❌ TARGET PUSH ERROR:',
+      err
+    );
+
+    await emitLog(
+      `❌ Target push failed: ${err.message}`
+    );
   }
 }
 
@@ -315,13 +309,16 @@ async function executePipeline(job) {
         console.log(log);
       };
 
-      job.status = 'IN_PROGRESS';
+      job.status =
+        'IN_PROGRESS';
 
       job.startedAt =
         new Date().toISOString();
 
       await prisma.job.update({
-        where: { id: job.id },
+        where: {
+          id: job.id
+        },
         data: {
           status: job.status,
           startedAt: new Date(
@@ -335,31 +332,46 @@ async function executePipeline(job) {
         'job_started'
       );
 
-      const repoDir = path.join(
-        __dirname,
-        '..',
-        'repos',
-        job.id
-      );
+      const tempDir =
+        path.join(
+          __dirname,
+          '..',
+          'temp',
+          `job-${job.id}`
+        );
 
-      /* =========================
-         CLONE REPOSITORY
-      ========================= */
+      const repoDir =
+        tempDir;
+
       try {
 
         fs.mkdirSync(
-          path.dirname(repoDir),
-          { recursive: true }
+          tempDir,
+          {
+            recursive: true
+          }
         );
+
+        const repoName =
+          job.repo
+            .split('/')
+            .pop()
+            .replace('.git', '');
+
+        const repoPath =
+          path.join(
+            __dirname,
+            '..',
+            repoName
+          );
 
         await emitLog(
-          `Cloning ${job.repo}`
+          `Copying ${repoName} to temp workspace`
         );
 
-        const git = simpleGit();
-
-        // Clean old repo
-        if (fs.existsSync(repoDir)) {
+        if (
+          fs.existsSync(repoDir)
+        ) {
 
           fs.rmSync(
             repoDir,
@@ -370,19 +382,12 @@ async function executePipeline(job) {
           );
         }
 
-        const authenticatedRepo =
-          job.repo.replace(
-            'https://',
-            `https://${process.env.GITHUB_TOKEN}@`
-          );
-
-        await emitLog(
-          '🔐 Using authenticated GitHub clone'
-        );
-
-        await git.clone(
-          authenticatedRepo,
-          repoDir
+        fs.cpSync(
+          repoPath,
+          repoDir,
+          {
+            recursive: true
+          }
         );
 
         const repoGit =
@@ -391,23 +396,7 @@ async function executePipeline(job) {
         const sourceBranch =
           job.branch || 'main';
 
-        const ciBranch =
-          'ci-logs';
-
-        // =========================
-        // FETCH REMOTE BRANCHES
-        // =========================
-
         await repoGit.fetch();
-
-        const remoteBranches =
-          await repoGit.branch([
-            '-r'
-          ]);
-
-        // =========================
-        // FORCE CLEAN WORKTREE
-        // =========================
 
         await repoGit.reset([
           '--hard'
@@ -418,79 +407,15 @@ async function executePipeline(job) {
           ['-d']
         );
 
-        // =========================
-        // SWITCH TO ci-logs
-        // =========================
-
-        if (
-          remoteBranches.all.includes(
-            `origin/${ciBranch}`
-          )
-        ) {
-
-          // Checkout existing ci-logs branch
-          await repoGit.checkout([
-            '-B',
-            ciBranch,
-            `origin/${ciBranch}`
-          ]);
-
-          console.log(
-            `✅ Checked out existing ${ciBranch}`
-          );
-
-        } else {
-
-          // Create fresh ci-logs branch
-          await repoGit.checkout([
-            '-b',
-            ciBranch
-          ]);
-
-          console.log(
-            `✅ Created new ${ciBranch} branch`
-          );
-
-          // Push branch upstream
-          await repoGit.push(
-            'origin',
-            ciBranch,
-            ['-u']
-          );
-        }
-
-        // =========================
-        // VERIFY ACTIVE BRANCH
-        // =========================
-
-        const activeBranch =
-          await repoGit.branchLocal();
+        await repoGit.checkout([
+          '-B',
+          sourceBranch,
+          `origin/${sourceBranch}`
+        ]);
 
         console.log(
-          'ACTIVE BRANCH:',
-          activeBranch.current
+          `✅ Checked out source branch: ${sourceBranch}`
         );
-
-        if (
-          activeBranch.current !== ciBranch
-        ) {
-
-          throw new Error(
-            `Failed to switch to ${ciBranch}`
-          );
-        } else {
-
-          // Create ci-logs branch
-          await repoGit.checkout([
-            '-B',
-            ciBranch,
-            `origin/${sourceBranch}`
-          ]);
-
-          console.log(
-            `✅ Created new ${ciBranch} branch`
-          );
-        }
 
       } catch (err) {
 
@@ -498,13 +423,17 @@ async function executePipeline(job) {
           `Clone failed: ${err.message}`
         );
 
-        job.status = 'FAILED';
+        job.status =
+          'FAILED';
 
         await prisma.job.update({
-          where: { id: job.id },
+          where: {
+            id: job.id
+          },
           data: {
             status: job.status,
-            failureReason: err.message
+            failureReason:
+              err.message
           }
         });
 
@@ -516,11 +445,18 @@ async function executePipeline(job) {
         return resolve();
       }
 
-      /* =========================
-         LOAD PIPELINE
-      ========================= */
+      const repoName =
+        job.repo
+          .split('/')
+          .pop()
+          .replace('.git', '');
+
       const stages =
-        getPipelineConfig(repoDir);
+        getPipelineConfig(
+          repoDir,
+          repoName,
+          job.branch
+        );
 
       if (
         !stages ||
@@ -531,21 +467,14 @@ async function executePipeline(job) {
           'No pipeline config found'
         );
 
-        job.status = 'FAILED';
-
-        await prisma.job.update({
-          where: { id: job.id },
-          data: {
-            status: job.status,
-            failureReason:
-              'No pipeline config'
-          }
-        });
+        job.status =
+          'FAILED';
 
         return resolve();
       }
 
-      job.stages = stages;
+      job.stages =
+        stages;
 
       for (const stage of stages) {
 
@@ -563,9 +492,6 @@ async function executePipeline(job) {
         'pipeline_updated'
       );
 
-      /* =========================
-         EXECUTION
-      ========================= */
       let failed = false;
 
       const dbStages =
@@ -579,10 +505,12 @@ async function executePipeline(job) {
 
         const dbStage =
           dbStages.find(
-            s => s.name === stage.name
+            s =>
+              s.name === stage.name
           );
 
-        const start = Date.now();
+        const start =
+          Date.now();
 
         if (dbStage) {
 
@@ -606,6 +534,11 @@ async function executePipeline(job) {
           `▶ ${stage.name}`
         );
 
+        await new Promise(
+          resolve =>
+            setTimeout(resolve, 3000)
+        );
+
         try {
 
           if (stage.commands) {
@@ -621,10 +554,116 @@ async function executePipeline(job) {
 
           } else {
 
+            const stageName =
+              stage.name.toLowerCase();
+
+            /* =========================
+               DOCKER BUILD
+            ========================= */
+
+            /* =========================
+   DOCKER BUILD
+========================= */
+
             if (
-              stage.name
-                .toLowerCase()
-                .includes('install')
+              stageName.includes(
+                'docker build'
+              )
+            ) {
+
+              const dockerfilePath =
+                path.join(
+                  repoDir,
+                  'Dockerfile'
+                );
+
+              if (
+                fs.existsSync(
+                  dockerfilePath
+                )
+              ) {
+
+                await emitLog(
+                  '🐳 Dockerfile detected'
+                );
+
+                await runCommand(
+                  `docker build -t nova-app-${job.id} .`,
+                  repoDir,
+                  emitLog
+                );
+
+              } else {
+
+                await emitLog(
+                  '⚠ No Dockerfile found. Skipping Docker build stage.'
+                );
+              }
+            }
+
+            /* =========================
+               RUN CONTAINER
+            ========================= */
+
+            else if (
+              stageName.includes(
+                'run container'
+              )
+            ) {
+
+              const dockerfilePath =
+                path.join(
+                  repoDir,
+                  'Dockerfile'
+                );
+
+              if (
+                fs.existsSync(
+                  dockerfilePath
+                )
+              ) {
+
+                await emitLog(
+                  '🚀 Starting isolated container'
+                );
+
+                await runCommand(
+                  `docker run --rm --name nova-job-${job.id} nova-app-${job.id}`,
+                  repoDir,
+                  emitLog
+                );
+
+              } else {
+
+                await emitLog(
+                  '⚠ Skipping container runtime (no Dockerfile)'
+                );
+              }
+            }
+
+            /* =========================
+               PUSH
+            ========================= */
+
+            else if (
+              stageName.includes(
+                'push'
+              )
+            ) {
+
+              await emitLog(
+                `📦 Simulated push for nova-app-${job.id}`
+              );
+            }
+
+            /* =========================
+               INSTALL
+            ========================= */
+
+            else if (
+              stageName.includes(
+                'install'
+              )
             ) {
 
               await runCommand(
@@ -632,11 +671,16 @@ async function executePipeline(job) {
                 repoDir,
                 emitLog
               );
+            }
 
-            } else if (
-              stage.name
-                .toLowerCase()
-                .includes('test')
+            /* =========================
+               TEST
+            ========================= */
+
+            else if (
+              stageName.includes(
+                'test'
+              )
             ) {
 
               await runCommand(
@@ -644,11 +688,16 @@ async function executePipeline(job) {
                 repoDir,
                 emitLog
               );
+            }
 
-            } else if (
-              stage.name
-                .toLowerCase()
-                .includes('build')
+            /* =========================
+               BUILD
+            ========================= */
+
+            else if (
+              stageName.includes(
+                'build'
+              )
             ) {
 
               await runCommand(
@@ -657,6 +706,24 @@ async function executePipeline(job) {
                 emitLog
               );
             }
+
+            /* =========================
+               SECURITY
+            ========================= */
+
+            else if (
+              stageName.includes(
+                'security'
+              )
+            ) {
+
+              await runCommand(
+                'npm audit',
+                repoDir,
+                emitLog
+              );
+            }
+
           }
 
           const duration =
@@ -715,12 +782,10 @@ async function executePipeline(job) {
         }
       }
 
-      /* =========================
-         FINALIZATION
-      ========================= */
-      job.status = failed
-        ? 'FAILED'
-        : 'COMPLETED';
+      job.status =
+        failed
+          ? 'FAILED'
+          : 'COMPLETED';
 
       job.completedAt =
         new Date().toISOString();
@@ -737,6 +802,30 @@ async function executePipeline(job) {
         }
       });
 
+      /* =========================
+         CLEANUP
+      ========================= */
+
+      try {
+
+        await runCommand(
+          `docker rm -f nova-job-${job.id}`,
+          repoDir,
+          emitLog
+        );
+
+      } catch { }
+
+      try {
+
+        await runCommand(
+          `docker rmi -f nova-app-${job.id}`,
+          repoDir,
+          emitLog
+        );
+
+      } catch { }
+
       if (!failed) {
 
         await pushMetadataToTarget(
@@ -751,6 +840,18 @@ async function executePipeline(job) {
         );
       }
 
+      try {
+
+        fs.rmSync(
+          repoDir,
+          {
+            recursive: true,
+            force: true
+          }
+        );
+
+      } catch { }
+
       await emitLog(
         job.status === 'COMPLETED'
           ? '✅ DONE'
@@ -762,16 +863,6 @@ async function executePipeline(job) {
         failed
           ? 'job_failed'
           : 'job_completed'
-      );
-
-      // Cleanup
-      fs.rm(
-        repoDir,
-        {
-          recursive: true,
-          force: true
-        },
-        () => { }
       );
 
       if (failed) {

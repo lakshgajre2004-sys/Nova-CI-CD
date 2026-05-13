@@ -12,6 +12,7 @@ const { ExpressAdapter } = require('@bull-board/express');
 const jobRoutes = require('./routes/jobs');
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
+const workerRoutes = require('./routes/workers');
 
 // Services
 const { addJob, initQueue } = require('./services/queue');
@@ -74,6 +75,7 @@ app.use(express.json({
 app.use('/api/jobs', jobRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/workers', workerRoutes);
 
 app.get('/', (req, res) => {
   res.send('✅ Jenkins Master Backend Running');

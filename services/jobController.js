@@ -85,46 +85,175 @@ async function triggerJob(req, res) {
 ========================= */
 
 async function getDashboard(req, res) {
+
   try {
-    const allJobs = await prisma.job.findMany({
-      include: { stages: true }
-    });
+
+    const allJobs =
+      await prisma.job.findMany({
+
+        include: {
+          stages: true
+        },
+
+        orderBy: {
+          createdAt: 'desc'
+        }
+
+      });
+
+    /*
+    ========================================
+    DASHBOARD BUCKETS
+    ========================================
+    */
 
     const dashboard = {
+
       queued: [],
+
       inProgress: [],
-      completed: []
+
+      completed: [],
+
+      failed: []
+
     };
 
+    /*
+    ========================================
+    SORT JOBS INTO SECTIONS
+    ========================================
+    */
+
     for (let job of allJobs) {
-      if (job.status === "QUEUED") {
-        dashboard.queued.push(job);
-      } else if (job.status === "IN_PROGRESS") {
-        dashboard.inProgress.push(job);
-      } else if (
-        job.status === "COMPLETED" ||
-        job.status === "FAILED"
+
+      if (
+        job.status === 'QUEUED'
       ) {
+
+        dashboard.queued.push(job);
+      }
+
+      else if (
+        job.status === 'IN_PROGRESS'
+      ) {
+
+        dashboard.inProgress.push(job);
+      }
+
+      else if (
+        job.status === 'COMPLETED'
+      ) {
+
         dashboard.completed.push(job);
+      }
+
+      else if (
+        job.status === 'FAILED'
+      ) {
+
+        dashboard.failed.push(job);
       }
     }
 
+    /*
+    ========================================
+    QUEUED → PRIORITY FIRST
+    ========================================
+    */
+
     dashboard.queued.sort(
-      (a, b) => (b.priority || 0) - (a.priority || 0) || new Date(a.createdAt) - new Date(b.createdAt)
+      (a, b) => {
+
+        return (
+          (b.priorityScore || 0) -
+          (a.priorityScore || 0)
+        ) ||
+
+          (
+            new Date(a.createdAt) -
+            new Date(b.createdAt)
+          );
+      }
     );
+
+    /*
+    ========================================
+    RUNNING → STARTED ORDER
+    ========================================
+    */
 
     dashboard.inProgress.sort(
-      (a, b) => new Date(a.startedAt) - new Date(b.startedAt)
+      (a, b) => {
+
+        return (
+          new Date(a.startedAt || a.createdAt) -
+          new Date(b.startedAt || b.createdAt)
+        );
+      }
     );
+
+    /*
+    ========================================
+    COMPLETED → NEWEST FIRST
+    ========================================
+    */
 
     dashboard.completed.sort(
-      (a, b) => new Date(b.completedAt) - new Date(a.completedAt)
+      (a, b) => {
+
+        return (
+          new Date(b.completedAt || b.createdAt) -
+          new Date(a.completedAt || a.createdAt)
+        );
+      }
     );
 
-    return res.json(dashboard);
+    /*
+    ========================================
+    FAILED → NEWEST FIRST
+    ========================================
+    */
+
+    dashboard.failed.sort(
+      (a, b) => {
+
+        return (
+          new Date(b.completedAt || b.createdAt) -
+          new Date(a.completedAt || a.createdAt)
+        );
+      }
+    );
+
+    /*
+    ========================================
+    LIMIT HISTORY
+    ========================================
+    */
+
+    dashboard.completed =
+      dashboard.completed.slice(0, 10);
+
+    dashboard.failed =
+      dashboard.failed.slice(0, 10);
+
+    /*
+    ========================================
+    RETURN FINAL DASHBOARD
+    ========================================
+    */
+
+    return res.json(
+      dashboard
+    );
+
   } catch (err) {
+
     console.error(err);
-    res.status(500).json({ error: "Failed to load dashboard" });
+
+    res.status(500).json({
+      error: 'Failed to load dashboard'
+    });
   }
 }
 
@@ -190,7 +319,7 @@ async function retryJob(req, res) {
     job.status = "QUEUED";
     job.startedAt = null;
     job.completedAt = null;
-    
+
     // Clear stages and logs in DB
     await prisma.stage.deleteMany({ where: { jobId: job.id } });
     await prisma.executionLog.deleteMany({ where: { jobId: job.id } });
@@ -205,11 +334,11 @@ async function retryJob(req, res) {
     });
 
     const { requeueJob } = require('../services/queue');
-    
+
     job.stages = [];
     job.logs = [];
     requeueJob(job);
-    
+
     broadcastJobUpdate(job, 'job_queued');
     console.log(`[JobController] Job retried and queued: ${job.id}`);
 
@@ -295,7 +424,7 @@ async function cancelJob(req, res) {
     const bullJob = await jobQueue.getJob(job.id);
     if (bullJob) {
       // bullmq remove won't work easily if job is active without token, but remove() tries.
-      await bullJob.remove().catch(() => {});
+      await bullJob.remove().catch(() => { });
     }
 
     broadcastJobUpdate(job, 'job_cancelled');

@@ -7,9 +7,14 @@ const {
   dockerQueue
 } = require('../queue/redisQueue');
 
-const { runJob } = require('./jobRunner');
+const { runJob } =
+  require('./jobRunner');
 
-const logger = require('../config/logger');
+const prisma =
+  require('../db');
+
+const logger =
+  require('../config/logger');
 
 /*
 ========================================
@@ -21,7 +26,7 @@ const workerRegistry = [];
 
 /*
 ========================================
-HELPER
+CREATE WORKER
 ========================================
 */
 
@@ -42,11 +47,63 @@ function createWorker({
         `[${name}] Executing job ${job.data.id}`
       );
 
+      /*
+      ========================================
+      ATTACH WORKER METADATA
+      ========================================
+      */
+
       job.data.workerType = type;
+
       job.data.workerName = name;
+
       job.data.queueName = queue.name;
 
+      /*
+      ========================================
+      MARK JOB AS IN_PROGRESS
+      ========================================
+      */
+
+      await prisma.job.update({
+
+        where: {
+          id: job.data.id
+        },
+
+        data: {
+
+          status: 'IN_PROGRESS',
+
+          startedAt: new Date(),
+
+          workerType: type
+
+        }
+
+      });
+
+      logger.info(
+        `[${name}] Job ${job.data.id} marked IN_PROGRESS`
+      );
+
+      /*
+      ========================================
+      RUN JOB
+      ========================================
+      */
+
       await runJob(job.data);
+
+      /*
+      ========================================
+      JOB COMPLETED
+      ========================================
+      */
+
+      logger.info(
+        `[${name}] Job ${job.data.id} completed successfully`
+      );
     },
 
     {
@@ -57,7 +114,7 @@ function createWorker({
 
   /*
   ========================================
-  EVENTS
+  ACTIVE EVENT
   ========================================
   */
 
@@ -68,6 +125,12 @@ function createWorker({
     );
   });
 
+  /*
+  ========================================
+  COMPLETED EVENT
+  ========================================
+  */
+
   worker.on('completed', (job) => {
 
     logger.info(
@@ -75,12 +138,60 @@ function createWorker({
     );
   });
 
-  worker.on('failed', (job, err) => {
+  /*
+  ========================================
+  FAILED EVENT
+  ========================================
+  */
+
+  worker.on('failed', async (job, err) => {
 
     logger.error(
       `[${name}] FAILED ${job?.id}: ${err.message}`
     );
+
+    /*
+    ========================================
+    UPDATE DB STATUS
+    ========================================
+    */
+
+    try {
+
+      if (job?.data?.id) {
+
+        await prisma.job.update({
+
+          where: {
+            id: job.data.id
+          },
+
+          data: {
+
+            status: 'FAILED',
+
+            completedAt: new Date(),
+
+            failureReason: err.message
+
+          }
+
+        });
+      }
+
+    } catch (dbErr) {
+
+      logger.error(
+        `[${name}] Failed updating FAILED state: ${dbErr.message}`
+      );
+    }
   });
+
+  /*
+  ========================================
+  WORKER ERROR
+  ========================================
+  */
 
   worker.on('error', (err) => {
 
@@ -91,16 +202,22 @@ function createWorker({
 
   /*
   ========================================
-  REGISTRY
+  REGISTER WORKER
   ========================================
   */
 
   workerRegistry.push({
+
     name,
+
     type,
+
     queue: queue.name,
+
     concurrency,
+
     worker
+
   });
 
   return worker;
@@ -108,7 +225,7 @@ function createWorker({
 
 /*
 ========================================
-START WORKERS
+START ALL WORKERS
 ========================================
 */
 
@@ -125,10 +242,15 @@ function startWorkers() {
   */
 
   createWorker({
+
     name: 'Node Worker #1',
+
     type: 'node',
+
     queue: nodeQueue,
+
     concurrency: 1
+
   });
 
   /*
@@ -138,10 +260,15 @@ function startWorkers() {
   */
 
   createWorker({
+
     name: 'Node Worker #2',
+
     type: 'node',
+
     queue: nodeQueue,
+
     concurrency: 1
+
   });
 
   /*
@@ -151,10 +278,15 @@ function startWorkers() {
   */
 
   createWorker({
+
     name: 'Python Worker',
+
     type: 'python',
+
     queue: pythonQueue,
+
     concurrency: 1
+
   });
 
   /*
@@ -164,10 +296,15 @@ function startWorkers() {
   */
 
   createWorker({
+
     name: 'Docker Worker',
+
     type: 'docker',
+
     queue: dockerQueue,
+
     concurrency: 1
+
   });
 
   logger.info(
@@ -205,7 +342,11 @@ EXPORTS
 */
 
 module.exports = {
+
   startWorkers,
+
   getWorkerStats,
+
   workerRegistry
+
 };
