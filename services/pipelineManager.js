@@ -865,18 +865,7 @@ async function executePipeline(job) {
           : 'job_completed'
       );
 
-      if (failed) {
-
-        reject(
-          new Error(
-            'Pipeline failed'
-          )
-        );
-
-      } else {
-
-        resolve();
-      }
+      resolve();
     }
   );
 }

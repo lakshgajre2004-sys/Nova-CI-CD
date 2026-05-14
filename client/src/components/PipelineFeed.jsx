@@ -43,7 +43,7 @@ export default function PipelineFeed({
 
   /*
   ========================================
-  SORT BY PRIORITY + NEWEST
+  SORTING LOGIC
   ========================================
   */
 
@@ -62,7 +62,38 @@ export default function PipelineFeed({
 
       /*
       ========================================
-      PRIORITY FIRST
+      RUNNING PIPELINES
+      LOW → MEDIUM → HIGH → CRITICAL
+      (CRITICAL APPEARS AT BOTTOM)
+      ========================================
+      */
+
+      if (type === 'running') {
+
+        if (
+          aPriority !== bPriority
+        ) {
+
+          return (
+            aPriority -
+            bPriority
+          );
+        }
+
+        return (
+          new Date(
+            a.createdAt
+          ) -
+          new Date(
+            b.createdAt
+          )
+        );
+      }
+
+      /*
+      ========================================
+      ALL OTHER SECTIONS
+      CRITICAL → HIGH → MEDIUM → LOW
       ========================================
       */
 

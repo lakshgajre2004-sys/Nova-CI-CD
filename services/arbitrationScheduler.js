@@ -53,7 +53,7 @@ function startArbitrationScheduler() {
       }
     }
 
-  }, 15000); // Every 15 seconds
+  }, 1000); // Every 10 seconds
 }
 
 module.exports = {
