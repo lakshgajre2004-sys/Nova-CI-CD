@@ -91,3 +91,4 @@ Write-Host ""
 Write-Host "Dashboard:"
 Write-Host "http://localhost:5173"
 
+Set-Location "C:\Users\Laksh\Nova"

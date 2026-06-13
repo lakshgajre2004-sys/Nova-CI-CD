@@ -2,9 +2,7 @@ const { Queue, Worker } = require('bullmq');
 const IORedis = require('ioredis');
 
 // Shared redis connection for BullMQ
-const connection = new IORedis({
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: process.env.REDIS_PORT || 6379,
+const connection = new IORedis(process.env.REDIS_URL || 'redis://127.0.0.1:6379', {
   maxRetriesPerRequest: null,
 });
 

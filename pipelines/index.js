@@ -5,6 +5,7 @@ const {
   parseJenkinsfile,
   parseStages
 } = require('../services/jenkinsfileParser');
+
 function getPipelineConfig(
   repoDir,
   repo = 'repo1',
